@@ -21,12 +21,12 @@ reduced.addEventListener('change',()=>{if(reduced.matches){art.style.removePrope
 
 // The page is ready before the study. No clinical volume, animation engine or
 // audio is requested until a visitor deliberately activates this section.
-let engine=null,initializing=null,attempt=0;
+let engine=null,initializing=null,attempt=0,activationIntent=0;
 const experience=$('experience'),loader=$('study-loading'),poster=$('study-poster');
 const controls=[$('play'),$('restart'),...document.querySelectorAll('.chapters button')];
 function busy(value){experience.setAttribute('aria-busy',String(value));controls.forEach(b=>b.disabled=value);$('command-input').disabled=value;$('send').disabled=value;}
 function studyReady(){loader.hidden=true;poster.hidden=true;busy(false);}
-function studyError(){loader.hidden=false;$('retry').hidden=false;controls.forEach(b=>b.disabled=true);$('command-input').disabled=true;$('send').disabled=true;}
+function studyError(){experience.setAttribute('aria-busy','false');loader.hidden=false;$('retry').hidden=false;controls.forEach(b=>b.disabled=true);$('command-input').disabled=true;$('send').disabled=true;}
 experience.addEventListener('studyready',studyReady);experience.addEventListener('studyerror',studyError);
 async function activate(){
  if(initializing)return initializing;
@@ -35,10 +35,20 @@ async function activate(){
  initializing=(async()=>{try{const url=new URL('../simulation/src/cinema.js',import.meta.url);if(attempt++)url.searchParams.set('retry',attempt);engine=await import(url.href);const loaded=await engine.ready;if(loaded)studyReady();return loaded;}catch{initializing=null;$('load-status').hidden=false;$('load-status').textContent='The study could not load. Please try again.';$('voice-state').textContent='Study unavailable';studyError();return false;}})();
  return initializing;
 }
-async function firstPlay(){if(await activate()){engine.startSequence();experience.scrollIntoView({block:'center',behavior:reduced.matches?'instant':'smooth'});}}
-async function firstRestart(){if(await activate())engine.showChapter(0);}
-async function firstChapter(event){const index=Number(event.currentTarget.dataset.step);if(await activate())engine.showChapter(index);}
+function studyVisible(){const rect=$('simulation').getBoundingClientRect();return !document.hidden&&!menu.open&&rect.bottom>0&&rect.top<innerHeight;}
+async function activateFor(action){
+ const intent=++activationIntent;
+ // Move at the visitor's click, never later when a network request completes.
+ experience.scrollIntoView({block:'center',behavior:reduced.matches?'instant':'smooth'});
+ if(await activate()&&intent===activationIntent&&studyVisible())action();
+}
+function firstPlay(){return activateFor(()=>engine.startSequence());}
+function firstRestart(){return activateFor(()=>engine.showChapter(0));}
+function firstChapter(event){const index=Number(event.currentTarget.dataset.step);return activateFor(()=>engine.showChapter(index));}
 $('play').addEventListener('click',firstPlay);$('restart').addEventListener('click',firstRestart);document.querySelectorAll('.chapters button').forEach(b=>b.addEventListener('click',firstChapter));
 document.querySelector('.try-it').addEventListener('toggle',event=>{if(event.target.open&&!initializing)activate();});
 $('retry').addEventListener('click',()=>{if(!engine)activate();else{loader.hidden=false;busy(true);}});
-if('IntersectionObserver'in window){const observer=new IntersectionObserver(entries=>{if(!entries[0].isIntersecting)engine?.pauseSequence();},{threshold:0});observer.observe($('simulation'));}
+function suspendStudy(){activationIntent++;engine?.pauseSequence();}
+if('IntersectionObserver'in window){const observer=new IntersectionObserver(entries=>{if(!entries[0].isIntersecting)suspendStudy();},{threshold:0});observer.observe($('simulation'));}
+document.addEventListener('visibilitychange',()=>{if(document.hidden)suspendStudy();});
+menuButton.addEventListener('click',suspendStudy);

@@ -14,8 +14,8 @@ Hero art cropping and responsive geometry; no initial scan payload; simulation c
 ## Steps
 
 - [x] Export/read the final Figma layer structure, text, styles and hero/section reference renders; prepare responsive original imagery.
-- [ ] Build all nine approved sections and responsive navigation; commit/push the first recognizable implementation.
-- [ ] Integrate lazy scan interaction and rotating-logo load/retry state. Add contact destinations, native disclosures and restrained scroll motion.
-- [ ] Build production output; run meaningful browser checks for responsive layouts, keyboard interactions, loading/cancellation, no audio and deferred data.
-- [ ] Measure image/JS/CSS/transfer budgets and Lighthouse locally; correct observed issues. Obtain one independent final code review.
-- [ ] Compare the implementation against Figma, finish documentation, commit/push the verified result and leave a working preview.
+- [x] Build all nine approved sections and responsive navigation; commit/push the first recognizable implementation.
+- [x] Integrate lazy scan interaction and rotating-logo load/retry state. Add contact destinations, native disclosures and restrained scroll motion.
+- [x] Build production output; run meaningful browser checks for responsive layouts, keyboard interactions, loading/cancellation, no audio and deferred data.
+- [x] Measure image/JS/CSS/transfer budgets and Lighthouse locally; correct observed issues. Obtain one independent final code review.
+- [x] Compare the implementation against Figma, finish documentation, commit/push the verified result and leave a working preview.

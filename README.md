@@ -24,7 +24,7 @@ The comparison volume is encoded as a lossless XOR delta against the current stu
 
 ## Contact setup
 
-Set `demoContact` and `ideaContact` in `site/config.json` to the real `mailto:` address, booking URL or form URL, then rebuild. These are intentionally unconfigured until the owner supplies the destinations. The current buttons lead to the contact section and do not submit anything. No inbox or submission success has been invented.
+Both contact paths open `demo@tattrex.com` in the visitor's email app, with separate subject lines for platform demos and Labs ideas. To change the destinations, edit `demoContact` and `ideaContact` in `site/config.json`, then rebuild. A button opens an email draft; it does not silently send a message or claim delivery.
 
 ## Verification
 
@@ -41,4 +41,4 @@ Browser tests connect to an **isolated** Chrome CDP instance at `http://127.0.0.
 
 Build with Node 22 or newer and upload the contents of `dist/` to a static host. The root route and standalone `/simulation/index.html` are self-contained. `.nojekyll`, sitemap and robots files are included. `_headers` supplies immutable caching for hashed assets on hosts that support it; other hosts should configure equivalent caching. Precompressed variants require host support, but the ordinary files work everywhere.
 
-This repository is prepared for the `tattrex.com` domain. Contact configuration and deployment are separate from the local build; pushing the implementation branch does not publish the site.
+This repository is prepared for the `tattrex.com` domain. Deployment is separate from the local build; pushing the implementation branch does not publish the site. See [verification results](docs/website-verification.md) for measured performance and checks.

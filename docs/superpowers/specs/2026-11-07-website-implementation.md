@@ -8,6 +8,6 @@ Initial loading must not be blocked by an artificial splash. The central logo ri
 
 All speech remains visual; no microphone, narration, audio playback or speech API. Keep chapter and typed interactions. Use progressive enhancement so navigation, copy, CT preview, Labs/FAQ and contact destinations remain usable without JavaScript.
 
-Contact destination is pending the user's answer. Do not invent an inbox, claim a request was submitted, or install a third-party form service. Provide real contact links or an honest email handoff once the destination is supplied. No invented testimonials, approvals, diagnostic performance claims or metrics.
+The owner supplied `demo@tattrex.com` for both contact paths. Open an email draft with separate platform-demo and Labs-idea subjects. Do not claim a request was submitted or install a third-party form service. No invented testimonials, approvals, diagnostic performance claims or metrics.
 
 Targets: main-route JavaScript under 15 KB gzip, CSS under 15 KB gzip, above-fold assets under 350 KB at mobile width, no initial CT-volume requests, no horizontal overflow at 360/390/768/1440 px, keyboard-operable controls, reduced motion, Lighthouse accessibility/performance at least 95 on the production build if locally measurable. Record actual results rather than claiming targets passed without measurements.

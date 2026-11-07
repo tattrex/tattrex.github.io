@@ -20,9 +20,11 @@ Modifications for the Tattrex review prototype:
 - Sorted by DICOM patient position, flipped from LPS into canonical RAS.
 - Arrays encoded as little-endian Int16 HU and Uint8 labels, gzip compressed.
 - Display windowing, MIP/MPR and coral/gold overlays are presentation operations.
-- prior.raw.gz is an explicitly derived illustration with a smooth local
+- The prior is an explicitly derived illustration with a smooth local
   ventricular deformation. It is not a source follow-up scan. current.raw.gz
   retains source pathology. No actual interval change is represented.
+- prior-delta.raw.gz stores the prior as a lossless 16-bit XOR against
+  current.raw.gz, followed by gzip. Decoding restores the exact prior voxels.
 
 The UI actions are scripted. Masks are dataset reference annotations, not
 Tattrex model predictions. No endorsement by the dataset creators is implied.

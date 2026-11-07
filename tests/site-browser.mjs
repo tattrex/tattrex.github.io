@@ -18,10 +18,12 @@ try{
   assert.ok(await page.locator('.hero-art img').evaluate(el=>el.complete&&el.naturalWidth>0));
   assert.equal(await page.locator('.hero-art').evaluate(el=>getComputedStyle(el).zIndex),'0');
   await page.screenshot({path:`artifacts/site-${width}.png`,fullPage:true});
-  if(width===390){await page.locator('.menu-toggle').click();assert.equal(await page.locator('#mobile-menu').evaluate(el=>el.open),true);await page.keyboard.press('Escape');assert.equal(await page.locator('#mobile-menu').evaluate(el=>el.open),false);assert.equal(await page.locator('.menu-toggle').getAttribute('aria-expanded'),'false');await page.locator('.menu-toggle').click();await page.locator('#mobile-menu a[href="#labs"]').click();assert.equal(await page.locator('#mobile-menu').evaluate(el=>el.open),false);}
+  if(width===390){await page.locator('.menu-toggle').click();assert.equal(await page.locator('#mobile-menu').evaluate(el=>el.open),true);assert.equal(await page.getByRole('dialog',{name:'Main navigation'}).count(),1);await page.keyboard.press('Escape');assert.equal(await page.locator('#mobile-menu').evaluate(el=>el.open),false);assert.equal(await page.locator('.menu-toggle').getAttribute('aria-expanded'),'false');await page.locator('.menu-toggle').click();await page.locator('#mobile-menu a[href="#labs"]').click();assert.equal(await page.locator('#mobile-menu').evaluate(el=>el.open),false);}
   const faq=page.locator('.faq details').first();await faq.locator('summary').focus();await page.keyboard.press('Enter');assert.ok(await faq.evaluate(el=>el.open));
   const research=page.locator('.research-directions details');await research.nth(1).locator('summary').click();assert.equal(await research.first().evaluate(el=>el.open),false);assert.equal(await research.nth(1).evaluate(el=>el.open),true);
   if(width===1440){
+   assert.match(await page.locator('#demo-contact').getAttribute('href'),/^mailto:demo@tattrex\.com\?subject=Tattrex%20platform%20demo$/);
+   assert.match(await page.locator('#idea-contact').getAttribute('href'),/^mailto:demo@tattrex\.com\?subject=Tattrex%20Labs/);
    const metrics=await page.evaluate(()=>performance.getEntriesByType('resource').filter(e=>!e.name.includes('/simulation/')).map(e=>({name:e.name.split('/').pop(),bytes:e.transferSize})));await writeFile('artifacts/site-transfer.json',JSON.stringify(metrics,null,2));
    // Hold the initial study request so the real loading state can be inspected.
    let release;const gate=new Promise(resolve=>release=resolve);await page.route('**/public/data/volume.json',async route=>{await gate;await route.continue();});
