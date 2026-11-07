@@ -1,0 +1,17 @@
+{
+  "source": "CPAISD v1",
+  "voxelsChecked": 7405568,
+  "ctMismatches": 0,
+  "referenceMaskMismatches": 0,
+  "sliceCount": 113,
+  "spacing": [
+    0.84375,
+    0.84375,
+    1.6999999999999886
+  ],
+  "maskClasses": [
+    0,
+    1,
+    2
+  ]
+}

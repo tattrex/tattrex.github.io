@@ -1,0 +1,20 @@
+[
+  {
+    "label": "Desktop",
+    "rootId": "27:6128",
+    "heroId": "27:6361",
+    "width": 1440
+  },
+  {
+    "label": "Tablet",
+    "rootId": "27:6445",
+    "heroId": "27:6629",
+    "width": 768
+  },
+  {
+    "label": "Mobile",
+    "rootId": "27:6679",
+    "heroId": "27:6855",
+    "width": 390
+  }
+]

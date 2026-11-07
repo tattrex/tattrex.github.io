@@ -1,0 +1,35 @@
+{
+  "flows": [
+    {
+      "id": "27:8598",
+      "name": "Concept 03 / Prototype / Desktop",
+      "contacts": {
+        "Demo": "27:8814",
+        "Idea": "27:8847"
+      }
+    },
+    {
+      "id": "27:9027",
+      "name": "Concept 03 / Prototype / Mobile",
+      "contacts": {
+        "Demo": "27:9193",
+        "Idea": "27:9226"
+      }
+    }
+  ],
+  "scenes": [
+    {
+      "id": "27:9604",
+      "name": "Concept 03 / Story / 01 See"
+    },
+    {
+      "id": "27:9665",
+      "name": "Concept 03 / Story / 02 Work"
+    },
+    {
+      "id": "27:9785",
+      "name": "Concept 03 / Story / 03 Discover"
+    }
+  ],
+  "wordReveal": "27:9941"
+}

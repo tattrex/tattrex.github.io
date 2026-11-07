@@ -1,0 +1,64 @@
+{
+  "dims": [
+    256,
+    256,
+    113
+  ],
+  "spacing": [
+    0.84375,
+    0.84375,
+    1.6999999999999886
+  ],
+  "orientation": "RAS",
+  "units": "HU",
+  "files": {
+    "current": "current.raw.gz",
+    "prior": "prior.raw.gz",
+    "mask": "infarct-mask.raw.gz"
+  },
+  "initialPoint": [
+    162,
+    125,
+    64
+  ],
+  "lesionPoint": [
+    162,
+    125,
+    64
+  ],
+  "ventricularPoint": [
+    127,
+    132,
+    64
+  ],
+  "source": "CPAISD",
+  "sourceCase": "validation/2.25.292842437493243996825712901028408554321",
+  "sourceUrl": "https://zenodo.org/records/10892316",
+  "license": "CC-BY-4.0",
+  "attribution": "Umerenkov D., Kudin S., Peksheva M., Pavlov D. (2024). CPAISD: Core-Penumbra Acute Ischemic Stroke Dataset. Zenodo. doi:10.5281/zenodo.10892316.",
+  "maskProvenance": "Expert reference annotation",
+  "maskLabels": {
+    "0": "Background",
+    "1": "Ischaemic core",
+    "2": "Penumbra"
+  },
+  "currentAltered": false,
+  "priorIsSynthetic": true,
+  "preprocessing": "Original HU and masks sampled at identical native voxel centres with stride 2 in-plane; native z spacing retained; LPS to RAS flips. No synthetic lesion or lesion-intensity modification.",
+  "scenario": "Real source CT and published expert reference masks. Priority and reporting actions are scripted. Prior is an explicitly derived illustration, not a real follow-up scan.",
+  "maskVoxelCounts": {
+    "0": 7203941,
+    "1": 27923,
+    "2": 173704
+  },
+  "nativeDims": [
+    512,
+    512,
+    113
+  ],
+  "nativeSpacing": [
+    0.421875,
+    0.421875,
+    1.6999999999999886
+  ]
+}

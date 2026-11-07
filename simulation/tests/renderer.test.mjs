@@ -1,0 +1,2 @@
+import test from 'node:test';import assert from 'node:assert/strict';import {pickVoxel} from '../src/renderer.js';
+test('picking a displayed voxel centre selects that same voxel',()=>{const volume={dims:[3,4,5],spacing:[1,1,1]};const canvas={viewTransform:{x:0,y:0,width:300,height:400,w:3,h:4,axis:'axial',index:1},getBoundingClientRect:()=>({left:0,top:0})};assert.deepEqual(pickVoxel(canvas,volume,50,50),[2,3,1]);assert.deepEqual(pickVoxel(canvas,volume,250,350),[0,0,1]);});

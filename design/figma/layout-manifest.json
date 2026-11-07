@@ -1,0 +1,38 @@
+[
+  {
+    "label": "Desktop",
+    "rootId": "7:2",
+    "platform": "15:309",
+    "labs": "15:353",
+    "approach": "15:383",
+    "tagline": "15:402",
+    "faq": "15:405",
+    "contact": "15:438",
+    "width": 1440,
+    "height": 6114
+  },
+  {
+    "label": "Tablet",
+    "rootId": "7:45",
+    "platform": "15:499",
+    "labs": "15:543",
+    "approach": "15:573",
+    "tagline": "15:592",
+    "faq": "15:595",
+    "contact": "15:628",
+    "width": 768,
+    "height": 8361
+  },
+  {
+    "label": "Mobile",
+    "rootId": "7:88",
+    "platform": "15:689",
+    "labs": "15:732",
+    "approach": "15:762",
+    "tagline": "15:781",
+    "faq": "15:784",
+    "contact": "15:817",
+    "width": 390,
+    "height": 8077
+  }
+]

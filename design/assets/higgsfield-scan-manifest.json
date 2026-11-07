@@ -1,0 +1,11 @@
+{
+  "model": "GPT Image 2.6",
+  "aspectRatio": "1:1",
+  "purpose": "Generated illustrative scan assets for design exploration; not patient data or clinical model output. Preserved as reusable Figma imaging components. The interactive MPR/MIP sequence uses the attributed voxel source described in simulation/README.md.",
+  "images": [
+    {"file":"synthetic-ct-chest-v3.png","generationId":"11649e8b-1370-4cc2-9554-b6f8131ff5d1","description":"Axial chest CT, lung window"},
+    {"file":"synthetic-mri-brain-v3.png","generationId":"74f10534-e167-41ff-8b04-3f1bb464bc1d","description":"Axial T2 brain MRI"},
+    {"file":"synthetic-mri-spine-v3.png","generationId":"e3db5ef6-a447-49a7-a14e-b34b3a562eca","description":"Sagittal T2 lumbar spine MRI"},
+    {"file":"synthetic-xray-chest-v3.png","generationId":"f92f17d0-b8d5-4597-b5f4-c6a2dd3ac3d7","description":"Frontal chest radiograph"}
+  ]
+}

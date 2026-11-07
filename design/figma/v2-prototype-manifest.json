@@ -1,0 +1,25 @@
+{
+  "flows": [
+    {
+      "name": "Concept 02 / Prototype / Desktop",
+      "id": "27:5296",
+      "contacts": {
+        "Demo": "27:5529",
+        "Idea": "27:5562"
+      }
+    },
+    {
+      "name": "Concept 02 / Prototype / Mobile",
+      "id": "27:5670",
+      "contacts": {
+        "Demo": "27:5846",
+        "Idea": "27:5879"
+      }
+    }
+  ],
+  "motion": "27:5222",
+  "tagline": "27:5286",
+  "darkNavSet": "27:4973",
+  "voiceSet": "27:5163",
+  "revealSet": "27:5202"
+}

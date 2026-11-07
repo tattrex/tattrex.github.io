@@ -1,0 +1,286 @@
+{
+  "collections": [
+    {
+      "name": "spacing",
+      "modes": [
+        "Value"
+      ],
+      "variables": 13
+    },
+    {
+      "name": "radius",
+      "modes": [
+        "Value"
+      ],
+      "variables": 9
+    },
+    {
+      "name": "Core Colors",
+      "modes": [
+        "Value"
+      ],
+      "variables": 145
+    },
+    {
+      "name": "Color System",
+      "modes": [
+        "Light"
+      ],
+      "variables": 116
+    },
+    {
+      "name": "Color System Dark",
+      "modes": [
+        "Dark"
+      ],
+      "variables": 116
+    }
+  ],
+  "variables": 399,
+  "textStyles": 28,
+  "audit": [
+    {
+      "id": "7:2",
+      "name": "Home / Desktop",
+      "width": 1440,
+      "height": 6114,
+      "sectionCount": 9,
+      "unstyledText": [],
+      "horizontalOverflow": [],
+      "faqWidths": [
+        {
+          "width": 1280,
+          "questionWidth": 1202
+        },
+        {
+          "width": 1280,
+          "questionWidth": 1202
+        },
+        {
+          "width": 1280,
+          "questionWidth": 1202
+        },
+        {
+          "width": 1280,
+          "questionWidth": 1202
+        },
+        {
+          "width": 1280,
+          "questionWidth": 1202
+        },
+        {
+          "width": 1280,
+          "questionWidth": 1202
+        }
+      ]
+    },
+    {
+      "id": "7:45",
+      "name": "Home / Tablet",
+      "width": 768,
+      "height": 8361,
+      "sectionCount": 9,
+      "unstyledText": [],
+      "horizontalOverflow": [],
+      "faqWidths": [
+        {
+          "width": 672,
+          "questionWidth": 594
+        },
+        {
+          "width": 672,
+          "questionWidth": 594
+        },
+        {
+          "width": 672,
+          "questionWidth": 594
+        },
+        {
+          "width": 672,
+          "questionWidth": 594
+        },
+        {
+          "width": 672,
+          "questionWidth": 594
+        },
+        {
+          "width": 672,
+          "questionWidth": 594
+        }
+      ]
+    },
+    {
+      "id": "7:88",
+      "name": "Home / Mobile",
+      "width": 390,
+      "height": 8173,
+      "sectionCount": 9,
+      "unstyledText": [],
+      "horizontalOverflow": [],
+      "faqWidths": [
+        {
+          "width": 342,
+          "questionWidth": 264
+        },
+        {
+          "width": 342,
+          "questionWidth": 264
+        },
+        {
+          "width": 342,
+          "questionWidth": 264
+        },
+        {
+          "width": 342,
+          "questionWidth": 264
+        },
+        {
+          "width": 342,
+          "questionWidth": 264
+        },
+        {
+          "width": 342,
+          "questionWidth": 264
+        }
+      ]
+    }
+  ],
+  "components": [
+    {
+      "name": "Button / Medium",
+      "count": 25
+    },
+    {
+      "name": "Navigation / Link",
+      "count": 5
+    },
+    {
+      "name": "FAQ / Item",
+      "count": 6
+    },
+    {
+      "name": "Input / Field",
+      "count": 14
+    },
+    {
+      "name": "Statement / Word reveal",
+      "count": 11
+    }
+  ],
+  "screens": [
+    {
+      "id": "7:2",
+      "name": "Home / Desktop",
+      "width": 1440,
+      "height": 6114
+    },
+    {
+      "id": "7:45",
+      "name": "Home / Tablet",
+      "width": 768,
+      "height": 8361
+    },
+    {
+      "id": "7:88",
+      "name": "Home / Mobile",
+      "width": 390,
+      "height": 8173
+    },
+    {
+      "id": "15:2748",
+      "name": "Prototype / Word reveal",
+      "width": 960,
+      "height": 724
+    },
+    {
+      "id": "15:2766",
+      "name": "Prototype / Desktop",
+      "width": 1440,
+      "height": 900
+    },
+    {
+      "id": "15:2922",
+      "name": "Contact / Demo / Desktop",
+      "width": 720,
+      "height": 830
+    },
+    {
+      "id": "15:2948",
+      "name": "Contact / Demo / Preview confirmation / Desktop",
+      "width": 720,
+      "height": 292
+    },
+    {
+      "id": "15:2955",
+      "name": "Contact / Idea / Desktop",
+      "width": 720,
+      "height": 884
+    },
+    {
+      "id": "15:2981",
+      "name": "Contact / Idea / Preview confirmation / Desktop",
+      "width": 720,
+      "height": 292
+    },
+    {
+      "id": "15:3076",
+      "name": "Prototype / Mobile",
+      "width": 390,
+      "height": 900
+    },
+    {
+      "id": "15:3228",
+      "name": "Contact / Demo / Mobile",
+      "width": 390,
+      "height": 790
+    },
+    {
+      "id": "15:3254",
+      "name": "Contact / Demo / Preview confirmation / Mobile",
+      "width": 390,
+      "height": 308
+    },
+    {
+      "id": "15:3261",
+      "name": "Contact / Idea / Mobile",
+      "width": 390,
+      "height": 844
+    },
+    {
+      "id": "15:3287",
+      "name": "Contact / Idea / Preview confirmation / Mobile",
+      "width": 390,
+      "height": 308
+    },
+    {
+      "id": "15:3376",
+      "name": "Navigation / Mobile panel",
+      "width": 390,
+      "height": 900
+    },
+    {
+      "id": "15:3381",
+      "name": "Prototype / Mobile / Platform",
+      "width": 390,
+      "height": 900
+    },
+    {
+      "id": "15:3432",
+      "name": "Prototype / Mobile / Labs",
+      "width": 390,
+      "height": 900
+    },
+    {
+      "id": "15:3467",
+      "name": "Prototype / Mobile / Our approach",
+      "width": 390,
+      "height": 900
+    },
+    {
+      "id": "15:3508",
+      "name": "Review / Read me first",
+      "width": 960,
+      "height": 864
+    }
+  ]
+}

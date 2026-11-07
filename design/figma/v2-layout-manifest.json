@@ -1,0 +1,44 @@
+[
+  {
+    "label": "Desktop",
+    "rootId": "27:3665",
+    "width": 1440,
+    "height": 7410.29736328125,
+    "heroId": "27:3821",
+    "introId": "27:4436",
+    "platformId": "27:4457",
+    "labsId": "27:4535",
+    "approachId": "27:4571",
+    "statementId": "27:4589",
+    "faqId": "27:3793",
+    "contactId": "27:4598"
+  },
+  {
+    "label": "Tablet",
+    "rootId": "27:3881",
+    "width": 768,
+    "height": 9041.5966796875,
+    "heroId": "27:4037",
+    "introId": "27:4633",
+    "platformId": "27:4654",
+    "labsId": "27:4706",
+    "approachId": "27:4736",
+    "statementId": "27:4754",
+    "faqId": "27:4009",
+    "contactId": "27:4763"
+  },
+  {
+    "label": "Mobile",
+    "rootId": "27:4083",
+    "width": 390,
+    "height": 8401.2724609375,
+    "heroId": "27:4235",
+    "introId": "27:4798",
+    "platformId": "27:4819",
+    "labsId": "27:4866",
+    "approachId": "27:4896",
+    "statementId": "27:4914",
+    "faqId": "27:4207",
+    "contactId": "27:4923"
+  }
+]

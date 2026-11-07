@@ -1,0 +1,127 @@
+{
+  "board": "27:18497",
+  "voiceSet": "27:18463",
+  "frames": [
+    {
+      "id": "27:13039",
+      "step": 0,
+      "phase": "Utterance"
+    },
+    {
+      "id": "27:13265",
+      "step": 0,
+      "phase": "Emphasis"
+    },
+    {
+      "id": "27:13491",
+      "step": 0,
+      "phase": "Settled"
+    },
+    {
+      "id": "27:13717",
+      "step": 1,
+      "phase": "Utterance"
+    },
+    {
+      "id": "27:13943",
+      "step": 1,
+      "phase": "Emphasis"
+    },
+    {
+      "id": "27:14169",
+      "step": 1,
+      "phase": "Settled"
+    },
+    {
+      "id": "27:14395",
+      "step": 2,
+      "phase": "Utterance"
+    },
+    {
+      "id": "27:14621",
+      "step": 2,
+      "phase": "Emphasis"
+    },
+    {
+      "id": "27:14847",
+      "step": 2,
+      "phase": "Settled"
+    },
+    {
+      "id": "27:15073",
+      "step": 3,
+      "phase": "Utterance"
+    },
+    {
+      "id": "27:15299",
+      "step": 3,
+      "phase": "Emphasis"
+    },
+    {
+      "id": "27:15525",
+      "step": 3,
+      "phase": "Settled"
+    },
+    {
+      "id": "27:15751",
+      "step": 4,
+      "phase": "Utterance"
+    },
+    {
+      "id": "27:15977",
+      "step": 4,
+      "phase": "Emphasis"
+    },
+    {
+      "id": "27:16203",
+      "step": 4,
+      "phase": "Settled"
+    },
+    {
+      "id": "27:16429",
+      "step": 5,
+      "phase": "Utterance"
+    },
+    {
+      "id": "27:16655",
+      "step": 5,
+      "phase": "Emphasis"
+    },
+    {
+      "id": "27:16881",
+      "step": 5,
+      "phase": "Settled"
+    },
+    {
+      "id": "27:17107",
+      "step": 6,
+      "phase": "Utterance"
+    },
+    {
+      "id": "27:17333",
+      "step": 6,
+      "phase": "Emphasis"
+    },
+    {
+      "id": "27:17559",
+      "step": 6,
+      "phase": "Settled"
+    },
+    {
+      "id": "27:17785",
+      "step": 7,
+      "phase": "Utterance"
+    },
+    {
+      "id": "27:18011",
+      "step": 7,
+      "phase": "Emphasis"
+    },
+    {
+      "id": "27:18237",
+      "step": 7,
+      "phase": "Settled"
+    }
+  ],
+  "mainScenesLinked": 7
+}

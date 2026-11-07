@@ -1,0 +1,8 @@
+{
+  "imageScenes": 16,
+  "referenceMaskControls": [
+    "Show core",
+    "Show penumbra"
+  ],
+  "problems": []
+}

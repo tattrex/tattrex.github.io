@@ -1,0 +1,16 @@
+{
+  "frameCount": 24,
+  "variantCount": 24,
+  "problems": [],
+  "inheritedVectorContainers": [
+    {
+      "sourceId": "15:945",
+      "name": "Brand / Scan focus artwork"
+    },
+    {
+      "sourceId": "15:949",
+      "name": "Brand / Drawn wordmark artwork"
+    }
+  ],
+  "scope": "24 motion frames and their layout/text. Two inherited SVG artwork containers intentionally retain vector geometry rather than auto layout."
+}

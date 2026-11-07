@@ -1,0 +1,56 @@
+{
+  "roots": [
+    {
+      "id": "27:3665",
+      "name": "Concept 02 / Desktop",
+      "width": 1440,
+      "height": 7410.29736328125,
+      "sections": 9,
+      "unstyledText": [],
+      "horizontalOverflow": []
+    },
+    {
+      "id": "27:3881",
+      "name": "Concept 02 / Tablet",
+      "width": 768,
+      "height": 9041.5966796875,
+      "sections": 9,
+      "unstyledText": [],
+      "horizontalOverflow": []
+    },
+    {
+      "id": "27:4083",
+      "name": "Concept 02 / Mobile",
+      "width": 390,
+      "height": 8401.2724609375,
+      "sections": 9,
+      "unstyledText": [],
+      "horizontalOverflow": []
+    }
+  ],
+  "logos": [
+    {
+      "id": "6:150",
+      "name": "Brand / Logo / Light",
+      "centreDotCount": 0
+    },
+    {
+      "id": "6:167",
+      "name": "Brand / Logo / Dark",
+      "centreDotCount": 0
+    }
+  ],
+  "flows": [
+    {
+      "id": "27:5296",
+      "name": "Concept 02 / Prototype / Desktop",
+      "clickTargets": 19
+    },
+    {
+      "id": "27:5670",
+      "name": "Concept 02 / Prototype / Mobile",
+      "clickTargets": 16
+    }
+  ],
+  "reviewFrame": "27:6119"
+}

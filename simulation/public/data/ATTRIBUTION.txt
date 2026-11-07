@@ -1,0 +1,29 @@
+CPAISD: Core-Penumbra Acute Ischemic Stroke Dataset (v1)
+Creators: Dmitriy Umerenkov, Stepan Kudin, Marina Peksheva, Denis Pavlov.
+Publication: 2024. DOI: 10.5281/zenodo.10892316
+Source: https://zenodo.org/records/10892316
+Paper: https://arxiv.org/abs/2404.02518
+Licence: Creative Commons Attribution 4.0 International (CC BY 4.0)
+Licence terms: https://creativecommons.org/licenses/by/4.0/legalcode
+
+Selected validation study: 2.25.292842437493243996825712901028408554321
+The data contain real anonymized non-contrast CT slices and expert masks.
+Labels: 0 = background, 1 = ischaemic core, 2 = penumbra.
+The dataset paper describes annotation by a radiologist with ten years of
+experience using CT perfusion maps as reference.
+
+Modifications for the Tattrex review prototype:
+- DICOM pixel rescale slope/intercept applied to obtain HU; matched original
+  published image.npz values exactly before preparation.
+- CT and masks sampled at identical native voxel centres, every second
+  in-plane voxel. No mask smoothing, new lesion, or lesion attenuation change.
+- Sorted by DICOM patient position, flipped from LPS into canonical RAS.
+- Arrays encoded as little-endian Int16 HU and Uint8 labels, gzip compressed.
+- Display windowing, MIP/MPR and coral/gold overlays are presentation operations.
+- prior.raw.gz is an explicitly derived illustration with a smooth local
+  ventricular deformation. It is not a source follow-up scan. current.raw.gz
+  retains source pathology. No actual interval change is represented.
+
+The UI actions are scripted. Masks are dataset reference annotations, not
+Tattrex model predictions. No endorsement by the dataset creators is implied.
+Source-file hashes are recorded in source-manifest.json.

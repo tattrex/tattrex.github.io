@@ -1,0 +1,23 @@
+{
+  "flows": [
+    {
+      "name": "Prototype / Desktop",
+      "nodeId": "15:2766",
+      "contacts": {
+        "Demo": "15:2922",
+        "Idea": "15:2955"
+      }
+    },
+    {
+      "name": "Prototype / Mobile",
+      "nodeId": "15:3076",
+      "contacts": {
+        "Demo": "15:3228",
+        "Idea": "15:3261"
+      }
+    }
+  ],
+  "motion": "15:2748",
+  "notes": "15:3508",
+  "inputSet": "15:2570"
+}

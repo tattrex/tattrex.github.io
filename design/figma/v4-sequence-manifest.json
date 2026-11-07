@@ -1,0 +1,48 @@
+{
+  "component": "27:10974",
+  "states": [
+    "27:10430",
+    "27:10498",
+    "27:10566",
+    "27:10634",
+    "27:10702",
+    "27:10770",
+    "27:10838",
+    "27:10906"
+  ],
+  "frames": [
+    {
+      "id": "27:11430",
+      "name": "Concept 04 / Voice sequence / 01 Prioritise"
+    },
+    {
+      "id": "27:11602",
+      "name": "Concept 04 / Voice sequence / 02 Navigate"
+    },
+    {
+      "id": "27:11774",
+      "name": "Concept 04 / Voice sequence / 03 Identify"
+    },
+    {
+      "id": "27:11946",
+      "name": "Concept 04 / Voice sequence / 04 Project"
+    },
+    {
+      "id": "27:12118",
+      "name": "Concept 04 / Voice sequence / 05 Reconstruct"
+    },
+    {
+      "id": "27:12290",
+      "name": "Concept 04 / Voice sequence / 06 Recall"
+    },
+    {
+      "id": "27:12462",
+      "name": "Concept 04 / Voice sequence / 07 Compare"
+    },
+    {
+      "id": "27:12634",
+      "name": "Concept 04 / Voice sequence / 08 Report"
+    }
+  ],
+  "scenesUpdated": 7
+}
