@@ -1,6 +1,6 @@
 ## Interaction motion refinement — V6
 
-The image and voice sequence now follows utterance → emphasis → settling. All eight instructions have operation specific motion in the [live prototype](http://127.0.0.1:4173/), including measured speech spectra and optional matching narration. The source CT and reference masks remain spatially aligned; the sculptural hero and Labs imagery are unchanged.
+The image and voice sequence now follows utterance → emphasis → settling. All eight instructions have operation specific motion in the [live prototype](http://127.0.0.1:4173/), including a changing visual spectrum and simulated utterances, with no actual speech or microphone capture. The source CT and reference masks remain spatially aligned; the sculptural hero and Labs imagery are unchanged.
 
 - [Figma motion direction](https://www.figma.com/design/hpRVQjO1COQCePQYbLJj1A?node-id=27-18497)
 - [Figma motion prototype](https://www.figma.com/proto/hpRVQjO1COQCePQYbLJj1A?node-id=27-13039&starting-point-node-id=27%3A13039&scaling=scale-down-width)

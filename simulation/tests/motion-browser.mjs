@@ -4,7 +4,7 @@ import {readFile} from 'node:fs/promises';
 const require=createRequire(import.meta.url),{chromium}=require(process.env.PLAYWRIGHT_PATH||'/private/tmp/tattrex-design-tools/node_modules/playwright-core');
 const browser=await chromium.connectOverCDP(process.env.BROWSER_CDP||'http://127.0.0.1:9324');
 const context=await browser.newContext({viewport:{width:1440,height:1100},reducedMotion:'no-preference'}),page=await context.newPage(),errors=[];
-const {tracks}=JSON.parse(await readFile(new URL('../public/audio/narration.json',import.meta.url)));
+const {tracks}=JSON.parse(await readFile(new URL('../public/motion/spectrum.json',import.meta.url)));
 page.on('pageerror',e=>errors.push(e.message));
 const phase=()=>page.locator('#experience').getAttribute('data-motion');
 const bars=()=>page.locator('#spectrum i').evaluateAll(es=>es.map(e=>e.style.transform));

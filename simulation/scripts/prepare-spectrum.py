@@ -1,11 +1,11 @@
-"""Render review narration locally, then measure its actual spectrum (40 fps).
+"""Prepare stored visual cadence profiles (40 fps) from temporary local synthesis.
 Requires macOS say, ffmpeg and numpy. No network or microphone recording.
 """
 import json, subprocess, tempfile, wave
 from pathlib import Path
 import numpy as np
 
-OUT = Path(__file__).resolve().parents[1] / 'public/audio'
+OUT = Path(__file__).resolve().parents[1] / 'public/motion'
 OUT.mkdir(parents=True, exist_ok=True)
 COMMANDS = [
     ('Open the most critical patient', 'Open the most critical patient.'),
@@ -28,8 +28,6 @@ with tempfile.TemporaryDirectory(prefix='tattrex-voice-') as temp:
         with wave.open(str(wav)) as f:
             rate = f.getframerate()
             samples = np.frombuffer(f.readframes(f.getnframes()), dtype='<i2').astype(float) / 32768
-        name = f'command-{index+1:02}.mp3'
-        subprocess.run(['ffmpeg', '-v', 'error', '-y', '-i', str(wav), '-codec:a', 'libmp3lame', '-b:a', '96k', str(OUT/name)], check=True)
         fps, size = 40, 2048
         freqs = np.fft.rfftfreq(size, 1/rate)
         edges = np.geomspace(80, 7500, 55)
@@ -46,7 +44,7 @@ with tempfile.TemporaryDirectory(prefix='tattrex-voice-') as temp:
         # Log compression preserves syllabic dynamics and silent gaps without a looping motif.
         matrix = np.log1p(matrix*1.6)
         matrix = np.clip(matrix / max(np.percentile(matrix,98.5),.01), 0, 1)
-        tracks.append({'text':text,'src':f'public/audio/{name}','duration':round(len(samples)/rate*1000),
+        tracks.append({'text':text,'duration':round(len(samples)/rate*1000),
                        'fps':fps,'frames':np.rint(matrix*255).astype(int).tolist()})
-        print(f'{name}: {tracks[-1]["duration"]} ms')
-(OUT/'narration.json').write_text(json.dumps({'source':'Locally synthesized Samantha narration; measured FFT bands, 80–7500 Hz. Word highlighting is estimated from text, not forced aligned.','tracks':tracks},separators=(',',':')))
+        print(f'{text}: {tracks[-1]["duration"]} ms')
+(OUT/'spectrum.json').write_text(json.dumps({'source':'Stored visual speech cadence: 54 bands at 40 fps. No audio playback or microphone access. Word emphasis is estimated from text.','tracks':tracks},separators=(',',':')))

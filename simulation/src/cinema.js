@@ -1,7 +1,6 @@
 import {loadDemoVolumes} from './volume.js';
 import {initialState,parseCommand,reduceCommand} from './commands.js';
 import {drawViewport} from './renderer.js';
-import {createSpeech} from './speech.js';
 import {createUtterance,voiceFrame,responseFrame,createMotionClock,easeOut} from './motion.js';
 const $=id=>document.getElementById(id),$$=selector=>[...document.querySelectorAll(selector)];
 const steps=[
@@ -15,8 +14,8 @@ const steps=[
  {command:'Draft the report',response:'The reference annotation carried into a draft. Ready for your review.',phase:'Report',caption:'From image to report · Review required'}
 ];
 let volumes=null,state=initialState(),viewState=state,loading=false,currentStep=-1;
-let playing=false,timer=null,deadline=0,remaining=7500,sound=false,drawFrame=0,layoutKey='';
-let recordings=[],moment=null,motion=null,audio=null,audioWait=null,audioAttempt=0,wordIndex=-1,speechActive=false;
+let playing=false,timer=null,deadline=0,remaining=7500,drawFrame=0,layoutKey='';
+let profiles=[],moment=null,motion=null,wordIndex=-1;
 const reduced=matchMedia('(prefers-reduced-motion: reduce)'),clock=createMotionClock();
 const bars=Array.from({length:54},()=>{const bar=document.createElement('i');$('spectrum').append(bar);return bar;});
 const silence={bars:Array(54).fill(0),energy:0,word:-1};
@@ -24,23 +23,6 @@ function wave(frame=silence){
  $('spectrum').classList.toggle('active',frame.energy>.025);
  bars.forEach((bar,i)=>{const value=reduced.matches?0:(frame.bars[i]||0);bar.style.transform=`scaleY(${.045+value*.955})`;bar.style.opacity=String(.34+value*.66);});
  $('voice-instrument').style.setProperty('--voice-energy',reduced.matches?0:frame.energy);
-}
-function stopAudio(){audioAttempt++;clearTimeout(audioWait);audioWait=null;if(audio){audio.pause();audio.removeAttribute('src');audio.load();audio=null;}window.speechSynthesis?.cancel();}
-function muteAudio(){
- audioAttempt++;clearTimeout(audioWait);audioWait=null;
- if(moment){moment.voiceAnchor=moment.voiceTime;moment.anchorClock=clock.elapsed;moment.useAudio=false;}
- audio?.pause();
-}
-function playAudio(){
- if(!sound||!moment?.track.recording||moment.voiceTime>=moment.track.duration||moment.direct||moment.applied&&!reduced.matches)return;
- if(!audio){audio=new Audio(moment.track.recording.src);audio.preload='auto';}
- if(!moment.useAudio){audio.currentTime=Math.min(moment.voiceTime/1000,moment.track.duration/1000);moment.voiceEndedAt=null;}
- moment.useAudio=true;
- const active=moment,attempt=++audioAttempt;
- const unavailable=()=>{if(moment===active&&attempt===audioAttempt){muteAudio();$('sound').textContent='Sound unavailable';}};
- audio.onerror=unavailable;
- clearTimeout(audioWait);audioWait=setTimeout(unavailable,2500);
- audio.play().then(()=>{if(moment===active&&attempt===audioAttempt){clearTimeout(audioWait);audioWait=null;$('sound').textContent='Sound on';}}).catch(unavailable);
 }
 function updateControls(){
  $('play').textContent=playing?'Pause sequence Ⅱ':currentStep>=7&&remaining===0?'Replay sequence ↺':currentStep>=0?'Continue sequence ▷':'Play the sequence ▷';
@@ -50,7 +32,7 @@ function updateControls(){
 }
 function pause(){
  if(timer)remaining=Math.max(0,deadline-performance.now());clearTimeout(timer);timer=null;playing=false;
- clock.pause();audioAttempt++;clearTimeout(audioWait);audioWait=null;audio?.pause();window.speechSynthesis?.cancel();
+ clock.pause();
  if(moment)moment.paused=true;
  if(moment&&!moment.done){$('experience').dataset.motion='paused';$('voice-state').textContent='Paused';}
  else $('voice-state').textContent=volumes?'Ready when you are':'Preparing';
@@ -62,7 +44,7 @@ function clearEffects(){
  $('image-field').style.setProperty('--emphasis',0);$('voice-instrument').style.setProperty('--response-emphasis',0);
 }
 function cancelMoment({settle=true}={}){
- clock.stop();stopAudio();moment=null;clearEffects();wave();wordIndex=-1;
+ clock.stop();moment=null;clearEffects();wave();wordIndex=-1;
  $('experience').dataset.motion='settled';$('response-text').style.opacity='';$('response-text').style.transform='';
  $$('#command-text .word').forEach(el=>el.className='word spoken');
  if(settle&&volumes){viewState=state;render();}
@@ -80,14 +62,14 @@ function highlightWord(index,complete=false){
 function setCopy(command,response,phase,caption){commandText(command);$('response-text').textContent=response;$('phase-label').textContent=phase;$('image-caption').textContent=caption;}
 function baseState(){return {...initialState(),point:[...volumes.meta.initialPoint]};}
 function sequenceState(index){let next=baseState();for(let i=0;i<=index;i++){next=reduceCommand(next,parseCommand(steps[i].command),volumes.meta).state;if(i===5)next={...next,mode:'axial',slabMm:0};}return next;}
-function beginMoment({command,response,phase,caption,target,before=state,kind,recording=null,direct=false,spoken=false}){
+function beginMoment({command,response,phase,caption,target,before=state,kind,profile=null,direct=false}){
  cancelMoment({settle:false});state=target;viewState=before;
- const track=createUtterance(command,recording),voiceDuration=direct?0:track.duration+160;
- moment={track,kind,before,target,voiceDuration,direct,spoken,elapsed:0,voiceTime:0,voiceAnchor:0,anchorClock:0,useAudio:false,voiceEndedAt:null,responseAt:null,applied:false,done:false,paused:false};
+ const track=createUtterance(command,profile),voiceDuration=direct?0:track.duration+160;
+ moment={track,kind,before,target,voiceDuration,direct,elapsed:0,responseAt:null,applied:false,done:false,paused:false};
  setCopy(command,response,phase,caption);$('experience').dataset.operation=kind;
- if(reduced.matches){viewState=state;render();highlightWord(track.words.length,true);wave();moment.applied=true;moment.done=true;$('experience').dataset.motion='settled';$('voice-state').textContent='In context';if(!direct){playAudio();clock.start(elapsed=>{if(!moment)return false;moment.elapsed=elapsed;updateVoiceTime(elapsed);return moment.voiceTime<moment.voiceDuration;});}updateControls();return;}
+ if(reduced.matches){viewState=state;render();highlightWord(track.words.length,true);wave();moment.applied=true;moment.done=true;$('experience').dataset.motion='settled';$('voice-state').textContent='In context';updateControls();return;}
  render();$('response-text').style.opacity='0';$('response-text').style.transform='translateY(8px)';
- if(!direct)playAudio();clock.start(advanceMoment);updateControls();
+ clock.start(advanceMoment);updateControls();
 }
 function addSlabEchoes(){
  // No viewer controls: these are adjacent source planes only.
@@ -99,25 +81,17 @@ function applyMoment(){
  if(!moment||moment.applied)return;moment.applied=true;viewState=state;render();
  if(moment.kind==='mip')addSlabEchoes();
 }
-function updateVoiceTime(elapsed){
- // Audible narration is the clock while it is playing or buffering. Muting
- // hands time back to the animation at that same position, without a jump.
- if(moment.useAudio&&audio){
-  if(audio.ended){if(moment.voiceEndedAt===null)moment.voiceEndedAt=elapsed;moment.voiceTime=moment.track.duration+elapsed-moment.voiceEndedAt;}
-  else moment.voiceTime=audio.currentTime*1000;
- }else moment.voiceTime=moment.voiceAnchor+elapsed-moment.anchorClock;
-}
 function advanceMoment(elapsed){
  if(reduced.matches){cancelMoment();$('voice-state').textContent='In context';return false;}
- if(!moment)return false;moment.elapsed=elapsed;updateVoiceTime(elapsed);
- const speaking=!moment.applied&&moment.voiceTime<moment.voiceDuration;
+ if(!moment)return false;moment.elapsed=elapsed;
+ const speaking=!moment.applied&&elapsed<moment.voiceDuration;
  if(speaking){
-  const frame=voiceFrame(moment.track,moment.voiceTime);wave(frame);highlightWord(frame.word);
+  const frame=voiceFrame(moment.track,elapsed);wave(frame);highlightWord(frame.word);
   $('experience').dataset.motion='speaking';$('voice-state').textContent='Listening';return true;
  }
  if(moment.responseAt===null)moment.responseAt=elapsed;
  applyMoment();
- if(moment.direct&&!moment.spoken&&elapsed<Math.min(1800,moment.track.duration)){const frame=voiceFrame(moment.track,elapsed);wave(frame);highlightWord(frame.word);}
+ if(moment.direct&&elapsed<Math.min(1800,moment.track.duration)){const frame=voiceFrame(moment.track,elapsed);wave(frame);highlightWord(frame.word);}
  else{highlightWord(moment.track.words.length,true);wave();}
  const age=elapsed-moment.responseAt,response=responseFrame(age);
  motion={...response,kind:moment.kind,fromWindow:moment.before.open?moment.before.window:'brain',fromMaskMode:moment.before.maskMode,hideOverlay:moment.kind==='overlay'&&!state.overlay};
@@ -152,13 +126,13 @@ function animateImages({reveal,emphasis},age){
 function showStep(index){
  if(!volumes)return;currentStep=index;remaining=7500;const step=steps[index];
  $('step-label').textContent=`${String(index+1).padStart(2,'0')} / 08`;
- beginMoment({...step,target:sequenceState(index),before:sequenceState(index-1),kind:parseCommand(step.command).type,recording:recordings[index]});
+ beginMoment({...step,target:sequenceState(index),before:sequenceState(index-1),kind:parseCommand(step.command).type,profile:profiles[index]});
 }
 function schedule(ms=remaining){clearTimeout(timer);deadline=performance.now()+ms;timer=setTimeout(()=>{timer=null;if(!playing)return;if(moment&&!moment.done){schedule(300);return;}if(currentStep>=steps.length-1){remaining=0;playing=false;$('voice-state').textContent='Ready for review';updateControls();return;}showStep(currentStep+1);schedule(7500);},ms);}
 function togglePlay(){
- if(playing){pause();return;}if(!volumes)return;speech.stop();
+ if(playing){pause();return;}if(!volumes)return;
  if(currentStep<0||currentStep>=7&&remaining===0){playing=true;showStep(0);}
- else{playing=true;if(moment?.paused){moment.paused=false;playAudio();clock.resume();}}
+ else{playing=true;if(moment?.paused){moment.paused=false;clock.resume();}}
  schedule(remaining);updateControls();
 }
 function displayZoom(s){return s.compare?1.3:s.mode==='mpr'?.94:s.zoom;}
@@ -180,38 +154,27 @@ function render(){
  $$('.scan-image').forEach(view=>view.querySelector('canvas').setAttribute('aria-label',`${view.dataset.time==='prior'?'Illustrative derived prior':'CPAISD source CT'}, ${view.dataset.axis} brain CT${viewState.overlay&&view.dataset.time==='current'?', with expert reference mask':''}`));
  scheduleDraw();updateControls();
 }
-function execute(text,{spoken=false}={}){
+function execute(text){
  if(!volumes){$('response-text').textContent=loading?'The imaging sequence is still loading.':'Images are unavailable. Use Retry images to try again.';return;}
- pause();speech.stop();const command=parseCommand(text),before=state;
+ pause();const command=parseCommand(text),before=state;
  if(command.type==='reset'){
   cancelMoment({settle:false});state=baseState();viewState=state;currentStep=-1;remaining=7500;
   setCopy('Open the most critical patient','A reading flow, shaped around your intent.','Navigate','A voice and AI workflow');highlightWord(99,true);$('step-label').textContent='01 / 08';$('voice-state').textContent='Ready when you are';render();return;
  }
  const result=reduceCommand(state,command,volumes.meta);let target=result.state;if(command.type==='priors'&&target.open)target={...target,mode:'axial',slabMm:0};
  const caption=target.open?target.overlay?(target.maskMode==='both'?'Core: coral · Penumbra: gold · Reference masks':'Stroke core · Expert reference mask'):'CT head · CPAISD source case':'A voice and AI workflow';
- beginMoment({command:text,response:result.notification||result.message,phase:'Your instruction',caption,target,before,kind:result.state===before?'feedback':command.type,direct:true,spoken});
+ beginMoment({command:text,response:result.notification||result.message,phase:'Your instruction',caption,target,before,kind:result.state===before?'feedback':command.type,direct:true});
 }
-const speech=createSpeech({onTranscript:text=>execute(text,{spoken:true}),onStatus:(status,interim)=>{
- $('mic').setAttribute('aria-pressed',String(status!=='idle'));$('mic').textContent=status==='idle'?'◉ Speak':'■ Stop';
- if(status==='listening'){
-  speechActive=true;$('voice-state').textContent='Listening';$('speech-status').textContent=interim||'Listening…';
-  if(interim){commandText(interim);const track=createUtterance(interim.split(/\s+/).slice(-4).join(' '));clock.start(ms=>{wave(voiceFrame(track,ms));highlightWord(99,true);return ms<track.duration;});}
- }else if(status==='connecting'){$('speech-status').textContent='Connecting to speech recognition…';}
- else{$('speech-status').textContent='Type a command or tap Speak.';if(speechActive){speechActive=false;clock.stop();wave();}}
-},onError:message=>{$('speech-error').textContent=message;$('speech-error').hidden=false;wave();}});
-$('mic').addEventListener('click',()=>{pause();cancelMoment();$('speech-error').hidden=true;speech.start();});
-if(!speech.supported){$('mic').disabled=true;$('mic').textContent='Voice unavailable';$('speech-status').textContent='Speech is unavailable in this browser. Type a command instead.';}
 $('command-form').addEventListener('submit',event=>{event.preventDefault();const text=$('command-input').value.trim();if(text){execute(text);$('command-input').value='';}});
 $('play').addEventListener('click',togglePlay);
-$('restart').addEventListener('click',()=>{const resume=playing;pause();speech.stop();if(!volumes)return;playing=resume;showStep(0);if(resume)schedule(7500);});
-$('sound').addEventListener('click',()=>{sound=!sound;$('sound').setAttribute('aria-pressed',String(sound));$('sound').textContent=sound?'Sound on':'Sound off';if(!sound)muteAudio();else if(!moment?.paused)playAudio();});
-$$('.chapters button').forEach(button=>button.addEventListener('click',()=>{pause();speech.stop();showStep(Number(button.dataset.step));}));
+$('restart').addEventListener('click',()=>{const resume=playing;pause();if(!volumes)return;playing=resume;showStep(0);if(resume)schedule(7500);});
+$$('.chapters button').forEach(button=>button.addEventListener('click',()=>{pause();showStep(Number(button.dataset.step));}));
 new ResizeObserver(scheduleDraw).observe($('image-field'));
 reduced.addEventListener('change',()=>{if(reduced.matches){cancelMoment();$('voice-state').textContent='In context';}});
-document.addEventListener('visibilitychange',()=>{if(document.hidden){pause();speech.stop();}});
+document.addEventListener('visibilitychange',()=>{if(document.hidden){pause();}});
 async function load(){
  if(loading)return;loading=true;$('experience').setAttribute('aria-busy','true');$('retry').hidden=true;$('load-status').hidden=false;$('load-status').textContent='Preparing the imaging sequence…';$('play').disabled=true;
- try{[volumes,recordings]=await Promise.all([loadDemoVolumes(),fetch('public/audio/narration.json').then(r=>r.ok?r.json():Promise.reject()).then(j=>j.tracks).catch(()=>[])]);state=baseState();viewState=state;$('load-status').hidden=true;$('voice-state').textContent='Ready when you are';$('play').disabled=false;wave();render();}
+ try{[volumes,profiles]=await Promise.all([loadDemoVolumes(),fetch('public/motion/spectrum.json').then(r=>r.ok?r.json():Promise.reject()).then(j=>j.tracks).catch(()=>[])]);state=baseState();viewState=state;$('load-status').hidden=true;$('voice-state').textContent='Ready when you are';$('play').disabled=false;wave();render();}
  catch(error){$('load-status').textContent='Images could not load. Please try again.';$('retry').hidden=false;$('voice-state').textContent='Images unavailable';}
  finally{loading=false;$('experience').setAttribute('aria-busy','false');}
 }

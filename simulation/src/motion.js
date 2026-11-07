@@ -2,20 +2,20 @@ const clamp=x=>Math.max(0,Math.min(1,x));
 export const easeOut=x=>1-Math.pow(1-clamp(x),3);
 const smooth=x=>{x=clamp(x);return x*x*(3-2*x);};
 
-// Recorded tours use measured spectra. Arbitrary text uses a deterministic cadence,
-// not a claim that microphone amplitudes or phonemes have been measured.
-export function createUtterance(text,recording=null){
+// Visual sequences use stored cadence profiles. Arbitrary text uses a deterministic
+// cadence. No audio is played and no microphone is accessed.
+export function createUtterance(text,profile=null){
  const tokens=text.trim().split(/\s+/).filter(Boolean),weights=tokens.map(w=>Math.max(1.5,w.replace(/[^a-z0-9]/gi,'').length*.52));
- const duration=recording?.duration||Math.min(3600,Math.max(1450,weights.reduce((a,b)=>a+b,0)*115+320));
+ const duration=profile?.duration||Math.min(3600,Math.max(1450,weights.reduce((a,b)=>a+b,0)*115+320));
  const total=weights.reduce((a,b)=>a+b,0)||1;let cursor=100;
  const words=tokens.map((text,i)=>{const start=cursor;cursor+=weights[i]/total*(duration-200);return {text,start,end:cursor};});
- return {text,words,duration,recording};
+ return {text,words,duration,profile};
 }
 export function voiceFrame(track,ms){
  const word=Math.max(0,track.words.findLastIndex(w=>ms>=w.start));
  if(ms<0||ms>=track.duration)return {bars:Array(54).fill(0),energy:0,word};
- if(track.recording){
-  const r=track.recording,f=ms/1000*r.fps,index=Math.floor(f),a=r.frames[index]||[],b=r.frames[index+1]||a,t=f-index;
+ if(track.profile){
+  const r=track.profile,f=ms/1000*r.fps,index=Math.floor(f),a=r.frames[index]||[],b=r.frames[index+1]||a,t=f-index;
   const bars=a.map((v,i)=>(v+((b[i]??v)-v)*t)/255);
   return {bars,energy:bars.length?Math.max(...bars):0,word};
  }

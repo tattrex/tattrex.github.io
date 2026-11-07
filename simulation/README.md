@@ -8,9 +8,9 @@ Run from the repository root:
 node simulation/server.mjs
 ```
 
-Open http://127.0.0.1:4173. Play the sequence, switch sound on for the recorded command narration, pause/restart, or jump to a chapter. “Try your own instruction” exposes optional spoken and typed commands. Microphone capture starts only after pressing Speak. Speech support varies by browser and may use the browser vendor's online recognition service; typed commands follow the same state path. Actual microphone capture has not been hardware-tested.
+Open http://127.0.0.1:4173. Play the silent visual sequence, pause/restart, or jump to a chapter. “Try your own instruction” exposes typed commands. There is no narration, microphone control, speech recognition or audio playback.
 
-The sequence covers priority case → brain window → acute infarct highlight → 15 mm MIP → MPR → priors → ventricular comparison → report draft. The guided spectrum is measured from those exact recordings (54 frequency bands, 40 samples per second), and audible playback drives the animation clock. Muted playback uses the same measured track. Word emphasis is estimated from text. Custom typed commands and microphone interim transcripts use a deterministic text cadence, not measured microphone amplitudes. Reduced motion applies the final images immediately while preserving narration and pause/resume.
+The sequence covers priority case → brain window → acute infarct highlight → 15 mm MIP → MPR → priors → ventricular comparison → report draft. The animated spectrum uses stored speech cadence profiles (54 bands, 40 samples per second), with estimated word emphasis. These are visual data, not audio files. Custom typed instructions use a deterministic text cadence. Reduced motion applies the final images immediately.
 
 ## Interaction motion
 
@@ -24,9 +24,9 @@ Each command has three beats: utterance → response → settling. The source im
 - Comparison briefly brackets the corresponding ventricular region in both images.
 - Reporting brings the response forward while the study remains visible.
 
-Chapter selection replays its utterance. Typed instructions respond immediately with a text driven spectrum; a completed microphone instruction responds without replaying the user's utterance. Pause freezes the active pose and narration. New commands, restart and hidden tabs cancel or suspend the existing sequence. Audio delay and failure do not let the scan run ahead of the command or block the visual fallback.
+Chapter selection replays the simulated utterance. Typed instructions respond immediately with an animated spectrum. Pause freezes the active pose; new commands, restart and hidden tabs cancel or suspend the existing sequence.
 
-The recordings and their measured spectra can be regenerated on macOS with `python simulation/scripts/prepare-narration.py` (NumPy, `say`, ffmpeg). Generated assets are served locally; no microphone data is stored by this prototype.
+The stored visual profiles can be regenerated offline on macOS with `python simulation/scripts/prepare-spectrum.py` (NumPy, `say`, ffmpeg). Temporary synthesis is used only to measure cadence; no sound files are retained or served. The website uses no browser audio or microphone APIs.
 
 ## Real abnormalities and reference masks
 
@@ -56,11 +56,10 @@ Brand vectors use the supplied dot-free Tattrex logo. Manrope is self-hosted wit
 node --test simulation/tests/*.test.mjs
 node simulation/tests/browser.mjs
 node simulation/tests/motion-browser.mjs
-node simulation/tests/audio-browser.mjs
 ```
 
 The browser script connects to an isolated Playwright Chrome over CDP, default `http://127.0.0.1:9324`. Configure `BROWSER_CDP`, `PLAYWRIGHT_PATH` and `DEMO_URL` if needed. It creates and closes its own context.
 
-24 unit tests cover volume math, physical slabs, orientation, multi-class reference masks, source provenance, command parsing, report data handling, voxel picking and speech lifecycle. Browser checks cover the complete visual sequence, pixel differences, mask extent, priors, cancellation/resumption, reduced motion, mobile overflow, failed image downloads and mocked speech failure paths. Additional browser checks verify intermediate mask emphasis, exact settled equality, changing speech spectra, real MIP echoes, pause/resume, cancelled reveals, reduced motion during playback, delayed audio, narration resumption, mute handoff and audio failure. Live microphone recognition remains environment-dependent.
+21 unit tests cover volume math, physical slabs, orientation, multi-class reference masks, source provenance, command parsing, report data handling, voxel picking. Browser checks cover the complete visual sequence, pixel differences, mask extent, priors, cancellation/resumption, reduced motion, mobile overflow, failed image downloads. Additional browser checks verify intermediate mask emphasis, exact settled equality, changing spectra, real MIP echoes, pause/resume, cancelled reveals, reduced motion during playback and typed commands. The workflow also runs with all browser audio and speech APIs configured to throw; no audio requests are made.
 
 This is an isolated review artifact, not the full marketing website or a deployed clinical product.
