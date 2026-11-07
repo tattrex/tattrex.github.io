@@ -10,7 +10,7 @@ css=css.replace('./manrope.woff2','./'+assetMap['manrope.woff2']);css=(await tra
 const js=(await transform(await readFile(new URL('site/main.js',root),'utf8'),{loader:'js',format:'esm',minify:true,target:'es2022'})).code;
 const cssName='site-'+hash(css)+'.css',jsName='site-'+hash(js)+'.js';await writeFile(new URL('assets/'+cssName,dist),css);await writeFile(new URL('assets/'+jsName,dist),js);
 const config=JSON.parse(await readFile(new URL('site/config.json',root),'utf8'));
-function replaceAssets(html){for(const [name,target] of Object.entries(assetMap))html=html.replaceAll('assets/'+name,'assets/'+target);return html.replaceAll('__STYLES__','assets/'+cssName).replaceAll('__SCRIPT__','assets/'+jsName);}
+function replaceAssets(html){for(const [name,target] of Object.entries(assetMap))html=html.replaceAll('assets/'+name,'assets/'+target);return html.replaceAll('__SITE_URL__',config.url).replaceAll('__STYLES__','assets/'+cssName).replaceAll('__SCRIPT__','assets/'+jsName);}
 let html=await readFile(new URL('site/index.html',root),'utf8');
 for(const [key,target] of [['demo',config.demoContact],['idea',config.ideaContact]])if(target){const escaped=target.replaceAll('&','&amp;').replaceAll('"','&quot;');html=html.replaceAll(`href="#contact" data-contact="${key}"`,`href="${escaped}" data-contact="${key}"`);}
 await writeFile(new URL('index.html',dist),replaceAssets(html));

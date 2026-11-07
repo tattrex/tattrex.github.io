@@ -43,4 +43,6 @@ Browser tests connect to an **isolated** Chrome CDP instance at `http://127.0.0.
 
 Build with Node 22 or newer and upload the contents of `dist/` to a static host. The root route and standalone `/simulation/index.html` are self-contained. `.nojekyll`, sitemap and robots files are included. `_headers` supplies immutable caching for hashed assets on hosts that support it; other hosts should configure equivalent caching. Precompressed variants require host support, but the ordinary files work everywhere.
 
-This repository is prepared for the `tattrex.com` domain. Deployment is separate from the local build; pushing the implementation branch does not publish the site. See [verification results](docs/website-verification.md) for measured performance and checks.
+The deployment target is **https://tattrex.github.io**. `.github/workflows/pages.yml` builds, tests and publishes `dist/` on every push to `main`, and also supports manual runs. GitHub Pages must be enabled with GitHub Actions as its source. Feature-branch pushes do not publish. The public URL in `site/config.json` controls canonical, social, sitemap and robots URLs; contact remains `demo@tattrex.com`.
+
+GitHub Pages manages its own caching and compression and does not apply the optional `_headers` file. See [verification results](docs/website-verification.md) for local measured performance and checks.
