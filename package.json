@@ -5,10 +5,12 @@
   "type": "module",
   "scripts": {
     "build": "node scripts/build.mjs",
+    "prepare:artwork": "node scripts/prepare-artwork.mjs",
     "dev": "npm run build && node scripts/serve.mjs",
     "preview": "node scripts/serve.mjs --dist",
     "test": "node --test simulation/tests/*.test.mjs tests/*.test.mjs",
     "test:browser": "node tests/site-browser.mjs && node tests/site-lifecycle.mjs",
+    "test:artwork": "node tests/artwork-browser.mjs",
     "check:budgets": "node scripts/check-budgets.mjs"
   },
   "devDependencies": {

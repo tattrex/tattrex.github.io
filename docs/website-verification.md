@@ -2,7 +2,13 @@
 
 Implemented the approved Figma layout using the native layer export and reference renders. Visually checked the porcelain hero, dark image-and-spectrum interaction, research atlas, stepped partnership, statement, FAQ, contact and oversized wordmark. Checked responsive layouts at 360, 390, 768 and 1440 pixels.
 
-## Production performance
+## 4K artwork update
+
+The hero and Labs art now have 4096 × 2294 masters, upscaled from the approved compositions through Higgsfield. Quality-92 responsive WebP exports extend to 3840px wide. The atlas `sizes` hint now matches the full image width behind the crop rather than the narrower visible frame. Browser checks verify actual selected URLs at 1x, 2x and 3x density, including the 4K variant. Medical scans and masks were left unchanged at the owner's request.
+
+The updated mobile Lighthouse audit scores **99 performance / 100 accessibility / 100 best practices / 100 SEO**, with 2.1s LCP, 0ms blocking time and zero layout shift. Total audit resource weight is 265 KiB. The calculated opening asset budget on a 3x mobile screen is 283,269 bytes, below 350 KB. The 25 unit/build checks and dedicated responsive-artwork browser checks pass. Reproduce the image exports with `npm run prepare:artwork` and selection checks with `npm run test:artwork`.
+
+## Initial implementation performance, before the 4K update
 
 Lighthouse 13.6.0 against the production `dist/` build, served locally with Brotli. Separate temporary headless Chrome profiles were used; no personal browser profile was accessed.
 

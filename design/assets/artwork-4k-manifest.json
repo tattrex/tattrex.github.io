@@ -1,0 +1,23 @@
+{
+  "method": "Higgsfield Bytedance Image Upscale",
+  "parameters": {"resolution":"4k","remove_bg":false},
+  "prompt": "Dedicated upscale model; no text generation prompt. Preserve the existing artwork composition.",
+  "masterDimensions": [4096,2294],
+  "delivery": {"format":"webp","quality":92,"method":6,"sharp_yuv":true,"maximumWidth":3840},
+  "hero": {
+    "sourceJob":"f7b381bb-4836-4e06-ace0-46ea5ee4b865",
+    "upscaleJob":"30b6b1f5-6e38-4aed-8219-3cfdc22c5f68",
+    "master":"tattrex-tomographic-sculpture-4k.png",
+    "url":"https://d8j0ntlcm91z4.cloudfront.net/user_3LIeevDBNaqTkqlQfQJAnXBXVQG/hf_20261107_220803_30b6b1f5-6e38-4aed-8219-3cfdc22c5f68.png",
+    "widths":[640,960,1440,1920,2560,2880,3840]
+  },
+  "labs": {
+    "sourceJob":"a1789aa2-a776-479f-9289-aa428ecd164a",
+    "upscaleJob":"3bba7a45-86e5-463e-ba2f-49add9dc74a9",
+    "master":"tattrex-research-atlas-4k.png",
+    "url":"https://d8j0ntlcm91z4.cloudfront.net/user_3LIeevDBNaqTkqlQfQJAnXBXVQG/hf_20261107_220951_3bba7a45-86e5-463e-ba2f-49add9dc74a9.png",
+    "widths":[800,1280,1920,2560,3840]
+  },
+  "medicalScans": "Unchanged, as explicitly requested by the owner.",
+  "vectors": "Existing dotless SVG logos and icons are resolution-independent."
+}

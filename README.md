@@ -20,6 +20,8 @@ Open http://127.0.0.1:4321. This builds and serves the production files. Run `np
 
 The main route loads a responsive WebP hero and a self-hosted Manrope font. The scan engine and all volumes load only after Play, chapter selection or opening the typed interaction. Below-fold artwork uses native lazy loading. Animations pause offscreen and respect reduced motion. The logo ring appears only while a study is actually loading.
 
+Hero and Labs artwork use preserved **4096 × 2294** Higgsfield-upscaled masters, with quality-92 WebP variants up to 3840px wide. Responsive selection accounts for screen density and the atlas's full rendered width behind its crop. Logos and icons remain SVG; medical scans and masks are unchanged. Run `npm run prepare:artwork` to reproduce the exports (requires `cwebp`), and `npm run test:artwork` to verify 1x/2x/3x browser selection. Source job IDs and export settings are in `design/assets/artwork-4k-manifest.json`.
+
 The comparison volume is encoded as a lossless XOR delta against the current study. The complete compressed volume payload is approximately 9.3 MB, fetched only on deliberate interaction. A test verifies the decoded prior against the original SHA-256; source HU and masks are unchanged.
 
 ## Contact setup
