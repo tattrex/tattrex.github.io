@@ -13,8 +13,8 @@
   "units": "HU",
   "files": {
     "current": "current.raw.gz",
-    "prior": "prior.raw.gz",
-    "mask": "infarct-mask.raw.gz"
+    "mask": "infarct-mask.raw.gz",
+    "priorDelta": "prior-delta.raw.gz"
   },
   "initialPoint": [
     162,
@@ -60,5 +60,6 @@
     0.421875,
     0.421875,
     1.6999999999999886
-  ]
+  ],
+  "priorEncoding": "Lossless 16-bit XOR against the current volume, then gzip; decoded voxels are unchanged."
 }

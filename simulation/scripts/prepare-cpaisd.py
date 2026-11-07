@@ -31,9 +31,12 @@ ventricular=[127,132,z0];z,y,x=np.indices(current.shape,dtype=np.float32)
 vx,vy,vz=ventricular;weight=np.exp(-.5*(((x-vx)/22)**2+((y-vy)/28)**2+((z-vz)/11)**2))
 prior=np.rint(map_coordinates(current.astype(np.float32),[z,vy+(y-vy)*(1+.10*weight),vx+(x-vx)*(1+.16*weight)],order=1,mode='nearest')).astype('<i2')
 target.mkdir(exist_ok=True,parents=True)
-for filename,a in [('current.raw.gz',current),('prior.raw.gz',prior),('infarct-mask.raw.gz',mask)]:
+prior_delta=np.bitwise_xor(current.view('<u2'),prior.view('<u2'))
+for filename,a in [('current.raw.gz',current),('prior-delta.raw.gz',prior_delta),('infarct-mask.raw.gz',mask)]:
  (target/filename).write_bytes(gzip.compress(a.tobytes(order='C'),compresslevel=9,mtime=0))
 meta={'dims':list(reversed(current.shape)),'spacing':[float(d0.PixelSpacing[1])*2,float(d0.PixelSpacing[0])*2,z_spacing],'orientation':'RAS','units':'HU','files':{'current':'current.raw.gz','prior':'prior.raw.gz','mask':'infarct-mask.raw.gz'},'initialPoint':lesion,'lesionPoint':lesion,'ventricularPoint':ventricular,'source':'CPAISD','sourceCase':'validation/2.25.292842437493243996825712901028408554321','sourceUrl':'https://zenodo.org/records/10892316','license':'CC-BY-4.0','attribution':'Umerenkov D., Kudin S., Peksheva M., Pavlov D. (2024). CPAISD: Core-Penumbra Acute Ischemic Stroke Dataset. Zenodo. doi:10.5281/zenodo.10892316.','maskProvenance':'Expert reference annotation','maskLabels':{'0':'Background','1':'Ischaemic core','2':'Penumbra'},'currentAltered':False,'priorIsSynthetic':True,'preprocessing':'Original HU and masks sampled at identical native voxel centres with stride 2 in-plane; native z spacing retained; LPS to RAS flips. No synthetic lesion or lesion-intensity modification.','scenario':'Real source CT and published expert reference masks. Priority and reporting actions are scripted. Prior is an explicitly derived illustration, not a real follow-up scan.','maskVoxelCounts':{str(v):int((mask==v).sum()) for v in [0,1,2]},'nativeDims':[512,512,len(slices)],'nativeSpacing':[float(d0.PixelSpacing[1]),float(d0.PixelSpacing[0]),z_spacing]}
+meta['files'].pop('prior');meta['files']['priorDelta']='prior-delta.raw.gz'
+meta['priorEncoding']='Lossless 16-bit XOR against the current volume, then gzip; decoded voxels are unchanged.'
 (target/'volume.json').write_text(json.dumps(meta,indent=2)+'\n')
 (target/'source-manifest.json').write_text(json.dumps({'archive':'https://zenodo.org/records/10892316/files/dataset.zip','archiveMD5':'a034be2cc6e93b5fb696231c59df900c','selectedFiles':hashes},indent=2)+'\n')
 print(json.dumps({'dims':meta['dims'],'spacing':meta['spacing'],'lesionPoint':lesion,'maskVoxelCounts':meta['maskVoxelCounts'],'assetBytes':{p.name:p.stat().st_size for p in target.glob('*.raw.gz')}},indent=2))

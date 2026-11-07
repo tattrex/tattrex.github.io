@@ -1,6 +1,6 @@
 # Tattrex — image and voice sequence
 
-A review prototype for the platform section. The presentation contains scan imagery, a voice spectrum and changing instructions. There is no PACS viewer chrome, worklist, toolbar or report panel. The sculptural marketing hero remains in Figma.
+A review prototype for the platform section. The presentation contains scan imagery, a voice spectrum and changing instructions. There is no PACS viewer chrome, worklist, toolbar or report panel. The full marketing site integrates this module through a deferred import.
 
 Run from the repository root:
 
@@ -46,7 +46,7 @@ Selected validation study: `2.25.292842437493243996825712901028408554321`, 113 s
 python simulation/scripts/prepare-cpaisd.py /path/to/extracted/CPAISD/case
 ```
 
-Requires NumPy, SciPy and pydicom. The script verifies DICOM-to-published-image HU equality, matching mask dimensions, uniform slice spacing and axial orientation. CT and masks use exactly the same native voxel centres, sampled with stride 2 in plane, then flipped LPS → RAS. Output is 256 × 256 × 113 at 0.84375 × 0.84375 × 1.7 mm. CT stays Int16 HU; labels stay discrete Uint8 values 0, 1 and 2. The gzip assets total about 16 MB. Original source-file hashes and archive identity are retained. Raw DICOM demographics are not served.
+Requires NumPy, SciPy and pydicom. The script verifies DICOM-to-published-image HU equality, matching mask dimensions, uniform slice spacing and axial orientation. CT and masks use exactly the same native voxel centres, sampled with stride 2 in plane, then flipped LPS → RAS. Output is 256 × 256 × 113 at 0.84375 × 0.84375 × 1.7 mm. CT stays Int16 HU; labels stay discrete Uint8 values 0, 1 and 2. The prior is encoded as a lossless XOR delta against the current study, then gzipped; the assets total about 9.3 MB. Decoded voxel values are verified against the original SHA-256. Original source-file hashes and archive identity are retained. Raw DICOM demographics are not served.
 
 Brand vectors use the supplied dot-free Tattrex logo. Manrope is self-hosted with its OFL licence. Higgsfield artwork remains in the design asset collection; this sequence uses the open dataset for anatomically matched abnormalities and masks.
 
@@ -60,6 +60,6 @@ node simulation/tests/motion-browser.mjs
 
 The browser script connects to an isolated Playwright Chrome over CDP, default `http://127.0.0.1:9324`. Configure `BROWSER_CDP`, `PLAYWRIGHT_PATH` and `DEMO_URL` if needed. It creates and closes its own context.
 
-21 unit tests cover volume math, physical slabs, orientation, multi-class reference masks, source provenance, command parsing, report data handling, voxel picking. Browser checks cover the complete visual sequence, pixel differences, mask extent, priors, cancellation/resumption, reduced motion, mobile overflow, failed image downloads. Additional browser checks verify intermediate mask emphasis, exact settled equality, changing spectra, real MIP echoes, pause/resume, cancelled reveals, reduced motion during playback and typed commands. The workflow also runs with all browser audio and speech APIs configured to throw; no audio requests are made.
+23 unit tests cover volume math, physical slabs, orientation, multi-class reference masks, source provenance, command parsing, report data handling, voxel picking. Browser checks cover the complete visual sequence, pixel differences, mask extent, priors, cancellation/resumption, reduced motion, mobile overflow, failed image downloads. Additional browser checks verify intermediate mask emphasis, exact settled equality, changing spectra, real MIP echoes, pause/resume, cancelled reveals, reduced motion during playback and typed commands. The workflow also runs with all browser audio and speech APIs configured to throw; no audio requests are made.
 
-This is an isolated review artifact, not the full marketing website or a deployed clinical product.
+This standalone route is a reference for the integrated marketing interaction, not a deployed clinical product.

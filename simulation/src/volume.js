@@ -54,15 +54,19 @@ export function sampleMaskPlane(volume,axis,index,{slabMm=0,labels=[1]}={}){
 export async function loadDemoVolumes(base=new URL('../public/data/',import.meta.url),fetcher=fetch){
  const response=await fetcher(new URL('volume.json',base));if(!response.ok)throw new Error('The demo volume metadata could not be loaded.');
  const meta=await response.json();
- const arrays=await Promise.all(['current','prior'].map(async key=>{
-  const r=await fetcher(new URL(meta.files[key],base));if(!r.ok)throw new Error('The demo images could not be loaded.');
+ const voxels=meta.dims.reduce((a,b)=>a*b,1);
+ async function download(file,bytes){
+  const r=await fetcher(new URL(file,base));if(!r.ok)throw new Error('The demo images could not be loaded.');
   const stream=r.body.pipeThrough(new DecompressionStream('gzip'));
   const buffer=await new Response(stream).arrayBuffer();
-  if(buffer.byteLength!==meta.dims.reduce((a,b)=>a*b,1)*2)throw new Error('The demo image download is incomplete.');
-  return {...meta,data:new Int16Array(buffer)};
- }));
- const maskResponse=await fetcher(new URL(meta.files.mask,base));if(!maskResponse.ok)throw new Error('The demonstration overlay could not be loaded.');
- const maskBuffer=await new Response(maskResponse.body.pipeThrough(new DecompressionStream('gzip'))).arrayBuffer();
- if(maskBuffer.byteLength!==meta.dims.reduce((a,b)=>a*b,1))throw new Error('The overlay download is incomplete.');
- return {meta,current:arrays[0],prior:arrays[1],mask:{...meta,data:new Uint8Array(maskBuffer)}};
+  if(buffer.byteLength!==bytes)throw new Error('The demo image download is incomplete.');
+  return buffer;
+ }
+ const [currentBuffer,priorBuffer,maskBuffer]=await Promise.all([
+  download(meta.files.current,voxels*2),download(meta.files.priorDelta||meta.files.prior,voxels*2),download(meta.files.mask,voxels)
+ ]);
+ const current=new Int16Array(currentBuffer),prior=new Int16Array(priorBuffer);
+ // XOR restores the exact signed 16-bit values, without resampling or quantising.
+ if(meta.files.priorDelta)for(let i=0;i<voxels;i++)prior[i]^=current[i];
+ return {meta,current:{...meta,data:current},prior:{...meta,data:prior},mask:{...meta,data:new Uint8Array(maskBuffer)}};
 }

@@ -17,6 +17,7 @@ let volumes=null,state=initialState(),viewState=state,loading=false,currentStep=
 let playing=false,timer=null,deadline=0,remaining=7500,drawFrame=0,layoutKey='';
 let profiles=[],moment=null,motion=null,wordIndex=-1;
 const reduced=matchMedia('(prefers-reduced-motion: reduce)'),clock=createMotionClock();
+$('spectrum').replaceChildren();
 const bars=Array.from({length:54},()=>{const bar=document.createElement('i');$('spectrum').append(bar);return bar;});
 const silence={bars:Array(54).fill(0),energy:0,word:-1};
 function wave(frame=silence){
@@ -27,6 +28,7 @@ function wave(frame=silence){
 function updateControls(){
  $('play').textContent=playing?'Pause sequence Ⅱ':currentStep>=7&&remaining===0?'Replay sequence ↺':currentStep>=0?'Continue sequence ▷':'Play the sequence ▷';
  $('progress-fill').style.width=`${(currentStep+1)/steps.length*100}%`;
+ $('progress-fill').parentElement.setAttribute('aria-valuenow',String(currentStep+1));
  $$('.chapters button').forEach((b,i)=>{b.classList.toggle('active',i===currentStep);b.setAttribute('aria-current',i===currentStep?'step':'false');});
  $('experience').dataset.mode=state.mode;$('experience').dataset.overlay=String(state.overlay);$('experience').dataset.open=String(state.open);$('experience').dataset.step=String(currentStep);
 }
@@ -174,8 +176,12 @@ reduced.addEventListener('change',()=>{if(reduced.matches){cancelMoment();$('voi
 document.addEventListener('visibilitychange',()=>{if(document.hidden){pause();}});
 async function load(){
  if(loading)return;loading=true;$('experience').setAttribute('aria-busy','true');$('retry').hidden=true;$('load-status').hidden=false;$('load-status').textContent='Preparing the imaging sequence…';$('play').disabled=true;
- try{[volumes,profiles]=await Promise.all([loadDemoVolumes(),fetch('public/motion/spectrum.json').then(r=>r.ok?r.json():Promise.reject()).then(j=>j.tracks).catch(()=>[])]);state=baseState();viewState=state;$('load-status').hidden=true;$('voice-state').textContent='Ready when you are';$('play').disabled=false;wave();render();}
- catch(error){$('load-status').textContent='Images could not load. Please try again.';$('retry').hidden=false;$('voice-state').textContent='Images unavailable';}
+ try{[volumes,profiles]=await Promise.all([loadDemoVolumes(),fetch(new URL('../public/motion/spectrum.json',import.meta.url)).then(r=>r.ok?r.json():Promise.reject()).then(j=>j.tracks).catch(()=>[])]);state=baseState();viewState=state;$('load-status').hidden=true;$('voice-state').textContent='Ready when you are';$('play').disabled=false;wave();render();$('experience').dispatchEvent(new CustomEvent('studyready'));return true;}
+ catch(error){$('load-status').textContent='Images could not load. Please try again.';$('retry').hidden=false;$('voice-state').textContent='Images unavailable';$('experience').dispatchEvent(new CustomEvent('studyerror'));return false;}
  finally{loading=false;$('experience').setAttribute('aria-busy','false');}
 }
-$('retry').addEventListener('click',load);load();
+$('retry').addEventListener('click',load);
+export const ready=load();
+export function startSequence(){togglePlay();}
+export function pauseSequence(){pause();}
+export function showChapter(index){pause();showStep(index);}
