@@ -45,4 +45,8 @@ The independent review found no critical issue. It reproduced the delayed-load n
 
 Visual fidelity and production audits were verified by the implementation owner. Live deployment and email delivery were outside this local verification. Both contact paths now open `demo@tattrex.com`, with separate platform and Labs subjects, as supplied by the owner. Opening a draft does not send email.
 
-No deferred code-review findings remain. The website is built and pushed on `codex/voice-workflow-demo`; it has not been published to the production domain.
+No deferred code-review findings remain. The website was merged into `main` and published through GitHub Pages at **https://tattrex.github.io/**. The owner explicitly approved making the repository public.
+
+## Published-site verification
+
+GitHub Actions successfully built, tested, uploaded and deployed the site. A browser check against the public HTTPS URL on 7 November 2026 confirmed HTTP 200, the correct canonical URL, Retina hero/Labs assets, both email destinations, live volume loading, the reference mask, MPR, prior comparison and mobile navigation. No browser errors or failed HTTP responses occurred. Subsequent pushes to `main` automatically run the same build/test/deploy workflow.
