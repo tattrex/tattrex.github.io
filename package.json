@@ -9,7 +9,7 @@
     "dev": "npm run build && node scripts/serve.mjs",
     "preview": "node scripts/serve.mjs --dist",
     "test": "node --test simulation/tests/*.test.mjs tests/*.test.mjs",
-    "test:browser": "node tests/site-browser.mjs && node tests/site-lifecycle.mjs",
+    "test:browser": "node tests/site-browser.mjs && node tests/site-lifecycle.mjs && node tests/site-sequence.mjs",
     "test:artwork": "node tests/artwork-browser.mjs",
     "check:budgets": "node scripts/check-budgets.mjs"
   },

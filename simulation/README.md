@@ -8,9 +8,9 @@ Run from the repository root:
 node simulation/server.mjs
 ```
 
-Open http://127.0.0.1:4173. Play the silent visual sequence, pause/restart, or jump to a chapter. “Try your own instruction” exposes typed commands. There is no narration, microphone control, speech recognition or audio playback.
+Open http://127.0.0.1:4173. The silent visual sequence plays automatically and loops while visible. Pause/restart or jump to a chapter at any time. An explicit pause persists when leaving and returning to the section. There is no narration, microphone control, speech recognition or audio playback.
 
-The sequence covers priority case → brain window → acute infarct highlight → 15 mm MIP → MPR → priors → ventricular comparison → report draft. The animated spectrum uses stored speech cadence profiles (54 bands, 40 samples per second), with estimated word emphasis. These are visual data, not audio files. Custom typed instructions use a deterministic text cadence. Reduced motion applies the final images immediately.
+The sequence covers priority case → brain window → acute infarct highlight → 15 mm MIP → MPR → priors → ventricular comparison → report draft. The animated spectrum uses stored speech cadence profiles (54 bands, 40 samples per second), with estimated word emphasis. These are visual data, not audio files. The final chapter writes an illustrative CT brain report beside the source infarct, with an 18-second chapter for writing and reading before the loop restarts. Reduced motion applies the final images and report immediately.
 
 ## Interaction motion
 
@@ -24,7 +24,7 @@ Each command has three beats: utterance → response → settling. The source im
 - Comparison briefly brackets the corresponding ventricular region in both images.
 - Reporting brings the response forward while the study remains visible.
 
-Chapter selection replays the simulated utterance. Typed instructions respond immediately with an animated spectrum. Pause freezes the active pose; new commands, restart and hidden tabs cancel or suspend the existing sequence.
+Chapter selection replays the simulated utterance and continues the loop, unless explicitly paused. Pause freezes image motion, waveform and report writing together. Hidden/offscreen sections suspend and automatically resume; chapter changes and restart cancel the previous animation.
 
 The stored visual profiles can be regenerated offline on macOS with `python simulation/scripts/prepare-spectrum.py` (NumPy, `say`, ffmpeg). Temporary synthesis is used only to measure cadence; no sound files are retained or served. The website uses no browser audio or microphone APIs.
 
@@ -54,12 +54,11 @@ Brand vectors use the supplied dot-free Tattrex logo. Manrope is self-hosted wit
 
 ```sh
 node --test simulation/tests/*.test.mjs
-node simulation/tests/browser.mjs
-node simulation/tests/motion-browser.mjs
+npm run test:browser
 ```
 
-The browser script connects to an isolated Playwright Chrome over CDP, default `http://127.0.0.1:9324`. Configure `BROWSER_CDP`, `PLAYWRIGHT_PATH` and `DEMO_URL` if needed. It creates and closes its own context.
+The browser script connects to an isolated Playwright Chrome over CDP, default `http://127.0.0.1:9324`. Configure `BROWSER_CDP`, `SITE_URL` and `DEMO_URL` if needed. Serve the production build on port 4321; the suite also checks its standalone `/simulation/index.html` route. It creates and closes its own context.
 
-23 unit tests cover volume math, physical slabs, orientation, multi-class reference masks, source provenance, command parsing, report data handling, voxel picking. Browser checks cover the complete visual sequence, pixel differences, mask extent, priors, cancellation/resumption, reduced motion, mobile overflow, failed image downloads. Additional browser checks verify intermediate mask emphasis, exact settled equality, changing spectra, real MIP echoes, pause/resume, cancelled reveals, reduced motion during playback and typed commands. The workflow also runs with all browser audio and speech APIs configured to throw; no audio requests are made.
+23 unit tests cover volume math, physical slabs, orientation, multi-class reference masks, source provenance, command parsing, report data handling, voxel picking. Browser checks cover the complete visual sequence, pixel differences, mask extent, priors, cancellation/resumption, reduced motion, mobile overflow, failed image downloads. Additional browser checks verify intermediate mask emphasis, exact settled equality, changing spectra, real MIP echoes, pause/resume, cancelled reveals, reduced motion during playback, progressive report typing, reading dwell, repeated full loops and responsive report layout. The workflow also runs with all browser audio and speech APIs configured to throw; no audio requests are made.
 
 This standalone route is a reference for the integrated marketing interaction, not a deployed clinical product.

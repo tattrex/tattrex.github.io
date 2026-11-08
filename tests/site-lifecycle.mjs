@@ -4,21 +4,28 @@ const browser=await chromium.connectOverCDP(process.env.BROWSER_CDP||'http://127
 const base=process.env.SITE_URL||'http://127.0.0.1:4321';
 const contexts=[];
 async function page(){const c=await browser.newContext({viewport:{width:1440,height:1000},reducedMotion:'reduce'});contexts.push(c);return c.newPage();}
+const loaded=p=>p.waitForFunction(()=>document.querySelector('#study-loading').hidden,{},{timeout:30000});
+const playing=p=>p.waitForFunction(()=>document.querySelector('#play').textContent.includes('Pause'));
 try{
- for(const selector of ['#play','.chapters [data-step="2"]']){
-  const p=await page();let release;const gate=new Promise(resolve=>release=resolve);
-  await p.route('**/public/data/volume.json',async route=>{await gate;await route.continue();});
-  await p.goto(base);await p.locator(selector).click();await p.waitForFunction(()=>!document.querySelector('#study-loading').hidden);
-  await p.locator('#contact').scrollIntoViewIfNeeded();const scroll=await p.evaluate(()=>scrollY);
-  release();await p.waitForFunction(()=>document.querySelector('#study-loading').hidden,{},{timeout:30000});
-  await p.evaluate(()=>new Promise(resolve=>requestAnimationFrame(()=>requestAnimationFrame(resolve))));
-  assert.equal(await p.evaluate(()=>scrollY),scroll,'Completing a study download must not pull a visitor back after they leave');
-  assert.doesNotMatch(await p.locator('#play').textContent(),/Pause/,'Playback must not start while offscreen');
-  assert.notEqual(await p.locator('#experience').getAttribute('data-motion'),'speaking','A pending chapter must not animate offscreen');
-  await p.locator('#play').click();await p.waitForFunction(()=>document.querySelector('#play').textContent.includes('Pause'));
- }
- const p=await page();await p.route('**/simulation/src/cinema.js',route=>route.abort());await p.goto(base);await p.locator('#play').click();await p.waitForFunction(()=>!document.querySelector('#retry').hidden);
- assert.equal(await p.locator('#experience').getAttribute('aria-busy'),'false','A failed module request must end its busy state');
- await p.unroute('**/simulation/src/cinema.js');await p.locator('#retry').click();await p.waitForFunction(()=>document.querySelector('#study-loading').hidden,{},{timeout:30000});assert.equal(await p.locator('#play').isDisabled(),false);
- console.log('PASS: navigation during deferred Play/chapter loads, deliberate resume, module-download failure and retry.');
+ const p=await page();let release;const gate=new Promise(resolve=>release=resolve);
+ await p.route('**/public/data/volume.json',async route=>{await gate;await route.continue();});
+ await p.goto(base);await p.locator('#experience').scrollIntoViewIfNeeded();await p.waitForFunction(()=>!document.querySelector('#study-loading').hidden);
+ await p.locator('#contact').scrollIntoViewIfNeeded();const scroll=await p.evaluate(()=>scrollY);
+ release();await loaded(p);
+ assert.equal(await p.evaluate(()=>scrollY),scroll,'A deferred download must not pull a visitor back');
+ assert.doesNotMatch(await p.locator('#play').textContent(),/Pause/,'Playback must not begin offscreen');
+ assert.equal(await p.locator('#experience').getAttribute('data-step'),'-1');
+ await p.locator('#experience').scrollIntoViewIfNeeded();await playing(p);
+ await p.locator('#contact').scrollIntoViewIfNeeded();await p.waitForFunction(()=>document.querySelector('#play').textContent.includes('Continue'));
+ await p.locator('#experience').scrollIntoViewIfNeeded();await playing(p);
+ await p.locator('#play').click();await p.locator('#contact').scrollIntoViewIfNeeded();await p.locator('#experience').scrollIntoViewIfNeeded();
+ await p.evaluate(()=>new Promise(resolve=>requestAnimationFrame(()=>requestAnimationFrame(resolve))));
+ assert.match(await p.locator('#play').textContent(),/Continue/,'An explicit pause survives leaving and returning');
+ await p.locator('#play').click();await playing(p);
+ // Module failures must be retryable without an automatic request loop.
+ const failed=await page();let attempts=0;await failed.route('**/simulation/src/cinema.js',route=>{attempts++;return route.abort();});
+ await failed.goto(base);await failed.locator('#experience').scrollIntoViewIfNeeded();await failed.waitForFunction(()=>!document.querySelector('#retry').hidden);
+ assert.equal(await failed.locator('#experience').getAttribute('aria-busy'),'false');assert.equal(attempts,1);
+ await failed.unroute('**/simulation/src/cinema.js');await failed.locator('#retry').click();await loaded(failed);await playing(failed);
+ console.log('PASS: viewport autoplay, deferred-load navigation, offscreen suspension/automatic return, persistent manual pause, module failure/retry.');
 }finally{for(const c of contexts)await c.close();await browser.close();}

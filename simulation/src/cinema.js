@@ -1,6 +1,7 @@
 import {loadDemoVolumes} from './volume.js';
 import {initialState,parseCommand,reduceCommand} from './commands.js';
 import {drawViewport} from './renderer.js';
+import {createReportPresenter,REPORT_DWELL,REPORT_WRITING_TIME} from './report.js';
 import {createUtterance,voiceFrame,responseFrame,createMotionClock,easeOut} from './motion.js';
 const $=id=>document.getElementById(id),$$=selector=>[...document.querySelectorAll(selector)];
 const steps=[
@@ -14,11 +15,12 @@ const steps=[
  {command:'Draft the report',response:'The reference annotation carried into a draft. Ready for your review.',phase:'Report',caption:'From image to report · Review required'}
 ];
 let volumes=null,state=initialState(),viewState=state,loading=false,currentStep=-1;
-let playing=false,timer=null,deadline=0,remaining=7500,drawFrame=0,layoutKey='';
+let active=false,manualPaused=false,playing=false,timer=null,deadline=0,remaining=7500,drawFrame=0,layoutKey='';
 let profiles=[],moment=null,motion=null,wordIndex=-1;
 const reduced=matchMedia('(prefers-reduced-motion: reduce)'),clock=createMotionClock();
 $('spectrum').replaceChildren();
 const bars=Array.from({length:54},()=>{const bar=document.createElement('i');$('spectrum').append(bar);return bar;});
+const report=createReportPresenter($('report-sheet'));report.reset();
 const silence={bars:Array(54).fill(0),energy:0,word:-1};
 function wave(frame=silence){
  $('spectrum').classList.toggle('active',frame.energy>.025);
@@ -26,7 +28,7 @@ function wave(frame=silence){
  $('voice-instrument').style.setProperty('--voice-energy',reduced.matches?0:frame.energy);
 }
 function updateControls(){
- $('play').textContent=playing?'Pause sequence Ⅱ':currentStep>=7&&remaining===0?'Replay sequence ↺':currentStep>=0?'Continue sequence ▷':'Play the sequence ▷';
+ $('play').textContent=playing?'Pause sequence Ⅱ':currentStep>=0?'Continue sequence ▷':'Play the sequence ▷';
  $('progress-fill').style.width=`${(currentStep+1)/steps.length*100}%`;
  $('progress-fill').parentElement.setAttribute('aria-valuenow',String(currentStep+1));
  $$('.chapters button').forEach((b,i)=>{b.classList.toggle('active',i===currentStep);b.setAttribute('aria-current',i===currentStep?'step':'false');});
@@ -37,7 +39,8 @@ function pause(){
  clock.pause();
  if(moment)moment.paused=true;
  if(moment&&!moment.done){$('experience').dataset.motion='paused';$('voice-state').textContent='Paused';}
- else $('voice-state').textContent=volumes?'Ready when you are':'Preparing';
+ else $('voice-state').textContent=volumes?'Paused':'Preparing';
+ $('experience').dataset.motion='paused';
  updateControls();
 }
 function clearEffects(){
@@ -46,7 +49,7 @@ function clearEffects(){
  $('image-field').style.setProperty('--emphasis',0);$('voice-instrument').style.setProperty('--response-emphasis',0);
 }
 function cancelMoment({settle=true}={}){
- clock.stop();moment=null;clearEffects();wave();wordIndex=-1;
+ clock.stop();moment=null;clearEffects();wave();wordIndex=-1;report.reset();$('experience').dataset.report='false';
  $('experience').dataset.motion='settled';$('response-text').style.opacity='';$('response-text').style.transform='';
  $$('#command-text .word').forEach(el=>el.className='word spoken');
  if(settle&&volumes){viewState=state;render();}
@@ -63,15 +66,21 @@ function highlightWord(index,complete=false){
 }
 function setCopy(command,response,phase,caption){commandText(command);$('response-text').textContent=response;$('phase-label').textContent=phase;$('image-caption').textContent=caption;}
 function baseState(){return {...initialState(),point:[...volumes.meta.initialPoint]};}
-function sequenceState(index){let next=baseState();for(let i=0;i<=index;i++){next=reduceCommand(next,parseCommand(steps[i].command),volumes.meta).state;if(i===5)next={...next,mode:'axial',slabMm:0};}return next;}
+function sequenceState(index){let next=baseState();for(let i=0;i<=index;i++){next=reduceCommand(next,parseCommand(steps[i].command),volumes.meta).state;if(i===5)next={...next,mode:'axial',slabMm:0};if(i===7)next={...next,mode:'axial',window:'brain',slabMm:0,priors:false,compare:false,overlay:true,maskMode:'core',point:[...volumes.meta.lesionPoint],zoom:1.15};}return next;}
 function beginMoment({command,response,phase,caption,target,before=state,kind,profile=null,direct=false}){
  cancelMoment({settle:false});state=target;viewState=before;
  const track=createUtterance(command,profile),voiceDuration=direct?0:track.duration+160;
  moment={track,kind,before,target,voiceDuration,direct,elapsed:0,responseAt:null,applied:false,done:false,paused:false};
  setCopy(command,response,phase,caption);$('experience').dataset.operation=kind;
- if(reduced.matches){viewState=state;render();highlightWord(track.words.length,true);wave();moment.applied=true;moment.done=true;$('experience').dataset.motion='settled';$('voice-state').textContent='In context';updateControls();return;}
+ if(reduced.matches||manualPaused){settleMoment();return;}
  render();$('response-text').style.opacity='0';$('response-text').style.transform='translateY(8px)';
  clock.start(advanceMoment);updateControls();
+}
+function settleMoment(){
+ if(!moment)return;clock.stop();viewState=state;render();highlightWord(moment.track.words.length,true);wave();clearEffects();
+ if(moment.kind==='report'){report.complete();$('experience').dataset.report='true';}
+ moment.applied=true;moment.done=true;$('experience').dataset.motion='settled';$('voice-state').textContent=moment.kind==='report'?'Ready for review':'In context';
+ $('response-text').style.opacity='';$('response-text').style.transform='';scheduleDraw();updateControls();
 }
 function addSlabEchoes(){
  // No viewer controls: these are adjacent source planes only.
@@ -82,9 +91,10 @@ function addSlabEchoes(){
 function applyMoment(){
  if(!moment||moment.applied)return;moment.applied=true;viewState=state;render();
  if(moment.kind==='mip')addSlabEchoes();
+ if(moment.kind==='report'){report.show();$('experience').dataset.report='true';}
 }
 function advanceMoment(elapsed){
- if(reduced.matches){cancelMoment();$('voice-state').textContent='In context';return false;}
+ if(reduced.matches){settleMoment();return false;}
  if(!moment)return false;moment.elapsed=elapsed;
  const speaking=!moment.applied&&elapsed<moment.voiceDuration;
  if(speaking){
@@ -101,10 +111,16 @@ function advanceMoment(elapsed){
  $('response-text').style.opacity=String(easeOut(age/450));$('response-text').style.transform=`translateY(${(1-easeOut(age/650))*8}px)`;
  $('voice-instrument').style.setProperty('--response-emphasis',response.emphasis);
  $('image-field').style.setProperty('--emphasis',response.emphasis);
- animateImages(response,age);scheduleDraw();
- if(response.phase==='settled'){
-  moment.done=true;clearEffects();scheduleDraw();return false;
+ if(response.phase!=='settled'||!moment.imageSettled){
+  animateImages(response,age);scheduleDraw();
+  if(response.phase==='settled'){moment.imageSettled=true;clearEffects();scheduleDraw();}
  }
+ if(moment.kind==='report'){
+  report.write(age/REPORT_WRITING_TIME);
+  $('voice-state').textContent=age<REPORT_WRITING_TIME?'Drafting report':'Ready for review';
+  if(age<REPORT_WRITING_TIME)return true;
+ }
+ if(response.phase==='settled'){moment.done=true;return false;}
  return true;
 }
 function animateImages({reveal,emphasis},age){
@@ -126,21 +142,32 @@ function animateImages({reveal,emphasis},age){
  $$('.slab-echo').forEach(el=>{const sign=Math.sign(Number(el.dataset.offset)),fold=1-easeOut(age/1150);el.style.transform=`translate3d(${sign*22*fold}px,${sign*30*fold}px,0) scale(${1+sign*.045*fold})`;el.style.opacity=String(.32*fold);});
 }
 function showStep(index){
- if(!volumes)return;currentStep=index;remaining=7500;const step=steps[index];
+ if(!volumes)return;currentStep=index;remaining=index===7?REPORT_DWELL:7500;const step=steps[index];
  $('step-label').textContent=`${String(index+1).padStart(2,'0')} / 08`;
  beginMoment({...step,target:sequenceState(index),before:sequenceState(index-1),kind:parseCommand(step.command).type,profile:profiles[index]});
 }
-function schedule(ms=remaining){clearTimeout(timer);deadline=performance.now()+ms;timer=setTimeout(()=>{timer=null;if(!playing)return;if(moment&&!moment.done){schedule(300);return;}if(currentStep>=steps.length-1){remaining=0;playing=false;$('voice-state').textContent='Ready for review';updateControls();return;}showStep(currentStep+1);schedule(7500);},ms);}
+function schedule(ms=remaining){
+ clearTimeout(timer);deadline=performance.now()+ms;
+ timer=setTimeout(()=>{timer=null;if(!playing)return;if(moment&&!moment.done){schedule(300);return;}showStep((currentStep+1)%steps.length);schedule();},ms);
+}
+function resume(){
+ if(playing||!volumes||!active||manualPaused)return;playing=true;
+ if(currentStep<0)showStep(0);
+ else if(moment?.paused){moment.paused=false;if(!moment.done)clock.resume();else{$('experience').dataset.motion='settled';$('voice-state').textContent=moment.kind==='report'?'Ready for review':'In context';}}
+ schedule();updateControls();
+}
 function togglePlay(){
- if(playing){pause();return;}if(!volumes)return;
- if(currentStep<0||currentStep>=7&&remaining===0){playing=true;showStep(0);}
- else{playing=true;if(moment?.paused){moment.paused=false;clock.resume();}}
- schedule(remaining);updateControls();
+ if(playing){manualPaused=true;pause();return;}
+ manualPaused=false;resume();
+}
+function selectChapter(index){
+ if(!volumes||!Number.isInteger(index)||index<0||index>=steps.length)return;
+ pause();showStep(index);if(active&&!manualPaused){playing=true;schedule();updateControls();}
 }
 function displayZoom(s){return s.compare?1.3:s.mode==='mpr'?.94:s.zoom;}
 function scheduleDraw(){
  cancelAnimationFrame(drawFrame);drawFrame=requestAnimationFrame(()=>{
-  if(!volumes)return;const drawState={...viewState,clean:true,zoom:displayZoom(viewState)};
+  if(!volumes)return;const drawState={...viewState,clean:true,thumbnail:viewState.report&&$('image-grid').clientWidth<100,zoom:displayZoom(viewState)};
   if(!viewState.open)drawState.window='brain';
   if(motion&&['compare','zoom'].includes(motion.kind))drawState.zoom=displayZoom(moment.before)+(drawState.zoom-displayZoom(moment.before))*motion.reveal;
   $$('.scan-image').forEach(view=>{const prior=view.dataset.time==='prior';drawViewport(view.querySelector('canvas'),prior?volumes.prior:volumes.current,drawState,view.dataset.axis,prior?null:volumes.mask,motion);});
@@ -156,32 +183,22 @@ function render(){
  $$('.scan-image').forEach(view=>view.querySelector('canvas').setAttribute('aria-label',`${view.dataset.time==='prior'?'Illustrative derived prior':'CPAISD source CT'}, ${view.dataset.axis} brain CT${viewState.overlay&&view.dataset.time==='current'?', with expert reference mask':''}`));
  scheduleDraw();updateControls();
 }
-function execute(text){
- if(!volumes){$('response-text').textContent=loading?'The imaging sequence is still loading.':'Images are unavailable. Use Retry images to try again.';return;}
- pause();const command=parseCommand(text),before=state;
- if(command.type==='reset'){
-  cancelMoment({settle:false});state=baseState();viewState=state;currentStep=-1;remaining=7500;
-  setCopy('Open the most critical patient','A reading flow, shaped around your intent.','Navigate','A voice and AI workflow');highlightWord(99,true);$('step-label').textContent='01 / 08';$('voice-state').textContent='Ready when you are';render();return;
- }
- const result=reduceCommand(state,command,volumes.meta);let target=result.state;if(command.type==='priors'&&target.open)target={...target,mode:'axial',slabMm:0};
- const caption=target.open?target.overlay?(target.maskMode==='both'?'Core: coral · Penumbra: gold · Reference masks':'Stroke core · Expert reference mask'):'CT head · CPAISD source case':'A voice and AI workflow';
- beginMoment({command:text,response:result.notification||result.message,phase:'Your instruction',caption,target,before,kind:result.state===before?'feedback':command.type,direct:true});
-}
-$('command-form').addEventListener('submit',event=>{event.preventDefault();const text=$('command-input').value.trim();if(text){execute(text);$('command-input').value='';}});
 $('play').addEventListener('click',togglePlay);
-$('restart').addEventListener('click',()=>{const resume=playing;pause();if(!volumes)return;playing=resume;showStep(0);if(resume)schedule(7500);});
-$$('.chapters button').forEach(button=>button.addEventListener('click',()=>{pause();showStep(Number(button.dataset.step));}));
-new ResizeObserver(scheduleDraw).observe($('image-field'));
-reduced.addEventListener('change',()=>{if(reduced.matches){cancelMoment();$('voice-state').textContent='In context';}});
-document.addEventListener('visibilitychange',()=>{if(document.hidden){pause();}});
+$('restart').addEventListener('click',()=>selectChapter(0));
+$$('.chapters button').forEach(button=>button.addEventListener('click',()=>selectChapter(Number(button.dataset.step))));
+new ResizeObserver(scheduleDraw).observe($('image-grid'));
+reduced.addEventListener('change',()=>{if(reduced.matches)settleMoment();});
 async function load(){
  if(loading)return;loading=true;$('experience').setAttribute('aria-busy','true');$('retry').hidden=true;$('load-status').hidden=false;$('load-status').textContent='Preparing the imaging sequence…';$('play').disabled=true;
- try{[volumes,profiles]=await Promise.all([loadDemoVolumes(),fetch(new URL('../public/motion/spectrum.json',import.meta.url)).then(r=>r.ok?r.json():Promise.reject()).then(j=>j.tracks).catch(()=>[])]);state=baseState();viewState=state;$('load-status').hidden=true;$('voice-state').textContent='Ready when you are';$('play').disabled=false;wave();render();$('experience').dispatchEvent(new CustomEvent('studyready'));return true;}
+ try{[volumes,profiles]=await Promise.all([loadDemoVolumes(),fetch(new URL('../public/motion/spectrum.json',import.meta.url)).then(r=>r.ok?r.json():Promise.reject()).then(j=>j.tracks).catch(()=>[])]);state=baseState();viewState=state;$('load-status').hidden=true;$('voice-state').textContent='Ready when you are';$('play').disabled=false;wave();render();$('experience').dispatchEvent(new CustomEvent('studyready'));resume();return true;}
  catch(error){$('load-status').textContent='Images could not load. Please try again.';$('retry').hidden=false;$('voice-state').textContent='Images unavailable';$('experience').dispatchEvent(new CustomEvent('studyerror'));return false;}
  finally{loading=false;$('experience').setAttribute('aria-busy','false');}
 }
 $('retry').addEventListener('click',load);
 export const ready=load();
-export function startSequence(){togglePlay();}
-export function pauseSequence(){pause();}
-export function showChapter(index){pause();showStep(index);}
+export function setActive(value){active=value;if(active)resume();else if(playing)pause();}
+// The standalone reference route shares the same visibility and playback rules.
+if($('experience').hasAttribute('data-standalone')){
+ const sync=()=>{const rect=$('demo').getBoundingClientRect();setActive(!document.hidden&&rect.bottom>0&&rect.top<innerHeight);};
+ new IntersectionObserver(sync).observe($('demo'));document.addEventListener('visibilitychange',sync);sync();
+}

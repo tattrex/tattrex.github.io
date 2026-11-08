@@ -21,7 +21,7 @@ export function drawViewport(canvas,volume,state,axis,mask=null,motion=null){
    for(let c=0;c<3;c++)image.data[p+c]=Math.round(grey*(1-a)+color[c]*a);}
  }
  ox.putImageData(image,0,0);
- const pw=w*sample.spacing[0],ph=h*sample.spacing[1],scale=Math.min((box.width-32)/pw,(box.height-48)/ph)*state.zoom;
+ const pw=w*sample.spacing[0],ph=h*sample.spacing[1],scale=Math.min((box.width-(state.thumbnail?8:32))/pw,(box.height-(state.thumbnail?8:48))/ph)*state.zoom;
  const width=pw*scale,height=ph*scale,focus=state.compare?planeFromVoxel(volume,axis,state.point):[w/2,h/2];
  const x=box.width/2-focus[0]/w*width,y=box.height/2-focus[1]/h*height;
  ctx.imageSmoothingEnabled=true;ctx.imageSmoothingQuality='high';ctx.drawImage(off,x,y,width,height);

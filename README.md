@@ -37,7 +37,7 @@ npm run check:budgets
 npm run test:browser
 ```
 
-Browser tests connect to an **isolated** Chrome CDP instance at `http://127.0.0.1:9324` and create their own contexts. Set `BROWSER_CDP` and `SITE_URL` to change the endpoints. The tests cover 360/390/768/1440 widths, mobile navigation, keyboard disclosures, deferred volumes, loading/retry, CT/MPR/masks/comparison, offscreen pause and absence of browser audio. Screenshots and measured transfer data go to ignored `artifacts/`.
+Browser tests connect to an **isolated** Chrome CDP instance at `http://127.0.0.1:9324` and create their own contexts. Set `BROWSER_CDP` and `SITE_URL` to change the endpoints. The tests cover 360/390/768/1440 widths, mobile navigation, keyboard disclosures, viewport-triggered study loading, loading/retry, CT/MPR/masks/comparison, waveform and image emphasis, automatic looping, report typing and reading time, persistent manual pause, offscreen suspend/resume, reduced motion and absence of browser audio. Report layout is also checked at 1024px. Screenshots and measured transfer data go to ignored `artifacts/`.
 
 ## Hosting
 
